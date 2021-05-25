@@ -216,10 +216,10 @@ Equations
          MINGENc(g,t)
          RAMPUPc(g,t)
          RAMPDOWNc(g,t)
-         UPTIME1c(g,t)
+         UPTIME1c(g)
          UPTIME2c(g,t)
          UPTIME3c(g,t)
-         DOWNTIME1c(g,t)
+         DOWNTIME1c(g)
          DOWNTIME2c(g,t)
          DOWNTIME3c(g,t)
          STARTUPCOSTc(g, t)
@@ -273,13 +273,14 @@ RAMPUPc(g,t)$(ord(t) gt 1) ..   gLevel(g,t) =l= gLevel(g, t-1) + gRampRate(g)*U(
 RAMPDOWNc(g,t)$(ord(t) gt 1) .. gLevel(g,t-1) - gLevel(g,t) =l= gRampRate(g)*U(g,t)+gMinCapacity(g)*(U(g,t-1)-U(g,t));
 
 * Min uptime
-UPTIME1c(g,t)$(ord(t) gt 1 and ord(t) le gOntime(g)*gInitState(g)).. sum(tp, 1 - U(g,tp)) =e= 0;
-UPTIME2c(g,t)$(ord(t) gt gOntime(g)*gInitState(g)+1).. sum(tp,U(g,tp)) =g= gMinUp(g)*(U(g,t) - U(g,t-1));
-UPTIME3c(g,t)$(ord(t) ge card(t)-gMinUp(g)+2).. sum(tp, U(g,tp)-(U(g,t)-U(g,t-1))) =g= 0;
+UPTIME1c(g).. sum(t$(ord(t) gt 1 and ord(t) le gOntime(g)*gInitState(g)), 1 - U(g,t)) =e= 0;
+UPTIME2c(g,t)$(ord(t) ge gOntime(g)*gInitState(g)+1 and ord(t) lt card(t)-gMinUp(g)+2).. sum(tp$(ord(tp) ge ord(t) and ord(tp) lt ord(t)+gMinUp(g)),U(g,tp)) =g= gMinUp(g)*(U(g,t) - U(g,t-1));
+UPTIME3c(g,t)$(ord(t) ge card(t)-gMinUp(g)+2 and ord(t) lt card(t)).. sum(tp$(ord(tp) ge ord(t)), U(g,tp)-(U(g,t)-U(g,t-1))) =g= 0;
+
 * Min downtime
-DOWNTIME1c(g,t)$(ord(t) gt 1 and ord(t)le gDowntime(g)*(1-gInitState(g))).. sum(tp, U(g,tp)) =e= 0;
-DOWNTIME2c(g,t)$(ord(t) gt gDowntime(g)*(1-gInitState(g))+1).. sum(tp,1-U(g,tp)) =g= gMinDown(g)*(U(g,t-1) - U(g,t));
-DOWNTIME3c(g,t)$(ord(t) ge card(t)-gMinDown(g)+2).. sum(tp, 1-U(g,tp)-(U(g,t-1)-U(g,t))) =g= 0;
+DOWNTIME1c(g).. sum(t$(ord(t) gt 1 and ord(t)le gDowntime(g)*(1-gInitState(g))), U(g,t)) =e= 0;
+DOWNTIME2c(g,t)$(ord(t) ge gDowntime(g)*(1-gInitState(g))+1 and ord(t) lt card(t)-gMinDown(g)+2).. sum(tp$(ord(tp) ge ord(t) and ord(tp) lt ord(t)+gMinDown(g)),1-U(g,tp)) =g= gMinDown(g)*(U(g,t-1) - U(g,t));
+DOWNTIME3c(g,t)$(ord(t) ge card(t)-gMinDown(g)+2 and ord(t) lt card(t)).. sum(tp$(ord(tp) ge ord(t)), 1-U(g,tp)-(U(g,t-1)-U(g,t))) =g= 0;
 
 * Storage state of charge
 SOCc(s,t)$(ord(t) gt 1) ..                sSOC(s,t) =e= sSOC(s,t-1)+ sChargeEff(s)*sCharge(s,t) - (1/sDischargeEff(s))*sDischarge(s,t);
