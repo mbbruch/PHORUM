@@ -1,5 +1,5 @@
 % PHORUM (PJM Hourly Open-source Reduced-form Unit commitment Model) 
-% Copyright (C) 2013  Roger Lueken
+% Copyright (C) 2013  Roger Lueken, 2016 Allison Weis
 % InitializeResultsStruct.m
 % 
 % This program is free software: you can redistribute it and/or modify
@@ -76,4 +76,11 @@ prevDayResults.gDowntime = [];
 prevDayResults.gInitState = [];
 prevDayResults.gInitGen = [];
 prevDayResults.sInitSOC = [];
+
+if settings.isEVanalysis == 1
+    totalResults.vSOC = [];
+    totalResults.vCharge = [];
+    totalResults.vDischarge = [];
+    prevDayResults.vInitSOC = [];
+end
     

@@ -1,5 +1,5 @@
 % PHORUM (PJM Hourly Open-source Reduced-form Unit commitment Model) 
-% Copyright (C) 2013  Roger Lueken
+% Copyright (C) 2013  Roger Lueken, 2016 Allison Weis
 % ParseOutputs.m
 % 
 % This program is free software: you can redistribute it and/or modify
@@ -31,6 +31,9 @@ function [totalResults, prevDayResults] = ParseOutputs(totalResults, PHORUMdata,
 % prevDayResults structure.
 numGens = length(PHORUMdata.genData.gHeatRate);
 numStors = length(PHORUMdata.storageData.sCapacity);
+if isEVanalysis
+load EVdata
+end
 
 % Check if this is the last day of the range.  If so, save results for all 48 hours.
  hour = 24;
@@ -106,12 +109,20 @@ if toc < 20 || toc > 7200
     totalResults.sCharge = [totalResults.sCharge, zeros(numStors,1)];
     totalResults.sDischarge = [totalResults.sDischarge, zeros(numStors,1)];
 
+    if isEVanalysis == 1   
+        totalResults.vSOC = [totalResults.vSOC, zeros(size(EVdata.prevSOC,1),hour,size(EVdata.prevSOC,2))];
+        totalResults.vCharge = [totalResults.vCharge, zeros(size(EVdata.prevSOC,1),1,size(EVdata.prevSOC,2))];
+        totalResults.vDischarge = [totalResults.vDischarge, zeros(size(EVdata.prevSOC,1),1,size(EVdata.prevSOC,2))];    
+    end
+
 % Set prevDayResults to null
      prevDayResults.gOntime = [];
      prevDayResults.gDowntime = [];
      prevDayResults.gInitState = [];
      prevDayResults.gInitGen = [];
      prevDayResults.sInitSOC = [];
+     if isEVanalysis == 1, prevDayResults.vInitSOC = []; end
+
      save('totalResults', 'totalResults');
     return;
 end
@@ -243,6 +254,18 @@ GAMSoutput.name = 'HourlyCost';
 output = rgdx('results.gdx', GAMSoutput);
 sysCost = output.val;
 
+% If running EVs, pull EV data
+if isEVanalysis == 1
+    GAMSoutput.name = 'vSOC';
+    GAMSoutput.compress = 'true';
+    GAMSoutput.form = 'full';
+    output = rgdx('results.gdx', GAMSoutput);
+    vSOC = output.val;
+%    GAMSoutput.name = 'vCharge';
+%    output = rgdx('results.gdx', GAMSoutput);
+%    vCharge = output.val;
+end
+
 % LMPs
 GAMSoutput.compress = 'false';
 GAMSoutput.field = 'm';
@@ -349,6 +372,34 @@ windTCR3 = windTCR3(2:hour+1);
 windTCR4 = windTCR4(2:hour+1);
 windTCR5 = windTCR5(2:hour+1);
 
+% EVs
+ if isEVanalysis == 1
+    % Track vSOC
+    if toc > 20 && toc < 7200 % If the day converged
+        vDiff = diff(vSOC,1,2);
+        vSOC = vSOC(:,2:hour+1,:);
+    else
+       vSOC = zeros(size(EVdata.prevSOC,1),hour,size(EVdata.prevSOC,2));
+       vDiff = zeros(size(EVdata.prevSOC,1),hour,size(EVdata.prevSOC,2));
+    end
+    % Track vCharge & vDischarge
+    vCharge = [];
+    vDischarge = [];
+    for y = 1 : size(vSOC,1)
+        for z = 1 : size(vSOC,3)
+            for i = 1 : hour
+                if vDiff(y,i,z) >= 0
+                    vCharge(y,i, z) = vDiff(y,i, z);
+                    vDischarge(y,i, z) = 0;
+                else
+                    vCharge(y,i, z) = 0;
+                    vDischarge(y,i, z) = -vDiff(y,i, z);
+                end
+            end
+        end
+    end
+end
+
 %% Load prevDayResults
 
 % How long generators have been on / off
@@ -384,6 +435,14 @@ end
 for index = 1 : size(sSOC,1)
     prevDayResults.sInitSOC(index) = sSOC(index,hour);
 end
+
+% Vehicle state of charge
+if isEVanalysis == 1
+    for index = 1:size(EVdata.number(:,1))
+        prevDayResults.vInitSOC(index,1:5) = squeeze(vSOC(index,hour,1:5));
+    end
+end
+
 
  %% Add the day's results to totalResults
 
@@ -497,6 +556,13 @@ end
 totalResults.sNetRevenue = [totalResults.sNetRevenue, sum(sNetRevenue,2)];
 totalResults.sCharge = [totalResults.sCharge, sum(sCharge,2)];
 totalResults.sDischarge = [totalResults.sDischarge, sum(sDischarge,2)];
+
+% EV outputs -- outputting HOURLY outputs.
+if isEVanalysis == 1
+    totalResults.vSOC = [totalResults.vSOC, vSOC];
+    totalResults.vCharge = [totalResults.vCharge, sum(vCharge,2)];
+    totalResults.vDischarge = [totalResults.vDischarge, sum(vDischarge,2)];    
+end
 
 save('totalResults', 'totalResults');
 

@@ -1,5 +1,5 @@
 % PHORUM (PJM Hourly Open-source Reduced-form Unit commitment Model) 
-% Copyright (C) 2013  Roger Lueken
+% Copyright (C) 2013  Roger Lueken, 2016 Allison Weis
 % Main.m
 % 
 % This program is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@ optWindow = 48;
 
 %% Load input data
 load(settings.dataFileName);
-
+totalLoad = [];
 % Initialize all results structures
 [totalResults, prevDayResults] = InitializeResultsStruct(settings);
 
@@ -52,7 +52,7 @@ for rangeIndex = 1 : settings.numDateRanges
         disp(['Running GAMS, day: ', num2str(day)]);
         
         % Create GDX files
-        CreateGDX(day, PHORUMdata, settings, prevDayResults, optWindow);
+        totalLoad=CreateGDX(day, PHORUMdata, settings, prevDayResults, optWindow,totalLoad);
         % Run GAMS
         system(settings.callGAMS);
 
@@ -66,5 +66,6 @@ disp(['Saving results to ', settings.outputFileName, '...']);
 outputs = SaveResults(totalResults, settings, PHORUMdata);
 
 
+save('totalLoad.mat','totalLoad')
 
 end

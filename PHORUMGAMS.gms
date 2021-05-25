@@ -1,5 +1,5 @@
 * PHORUM (PJM Hourly Open-source Reduced-form Unit commitment Model)
-* Copyright (C) 2013  Roger Lueken
+* Copyright (C) 2013  Roger Lueken, 2016 Allison Weis
 * PHORUMGAMS.gms
 *
 * This program is free software: you can redistribute it and/or modify
@@ -48,6 +48,19 @@ Parameter windMaxTCR3(t);
 Parameter windMaxTCR4(t);
 Parameter windMaxTCR5(t);
 $LOAD t loadTCR1 loadTCR2 loadTCR3 loadTCR4 loadTCR5 TI12max TI13max TI15max TI52max TI23max TI34max LMPTCR1actual LMPTCR2actual LMPTCR3actual LMPTCR4actual LMPTCR5actual windMaxTCR1 windMaxTCR2 windMaxTCR3 windMaxTCR4 windMaxTCR5
+
+$GDXIN VehData.gdx
+set v "vehicle profile";
+set a "transmission area";
+Parameter vAvailable(t,v)        "percent of timestep that the vehicle is home to charge";
+Parameter vMiles(t,v)            "miles the vehicle drives before charging";
+Parameter vNum(v,a)              "number of electric vehicles in the area";
+Parameter vInitSOC(v,a)          "State of charge at the beginning of the day";
+Parameter    vBattery(v)               "Size of the battery in MWh";
+Parameter    vCR(v)                    "Charging rate in MW";
+Parameter   vEff(v)                    "electric effficiency of the vehicles in MWh/mile";
+
+$LOAD v a vAvailable vMiles vNum vInitSOC vBattery vCR vEff
 
 set tOpt(t) "optimization periods";
 alias (t, tp);
@@ -125,6 +138,10 @@ Variables
          sDischarge(s,t)       Storage discharging rate
          sSOC(s, t)            Storage state of charge
 
+* Vehicle Variables
+         vSOC(v,t,a)
+         vCharge(v,t,a)
+
 * Set limits on variables
 Positive variable gLevel;
 Positive variable windTCR1;
@@ -155,6 +172,14 @@ sDischarge.up(s,t) = sRampRate(s);
 sSOC.lo(s,t) = 0.1;
 sSOC.up(s,t) = sSOCmax(s);
 
+vCharge.up(v,t,a) = vNum(v,a)*vCR(v)*vAvailable(t,v);
+
+vSOC.lo(v,t,a) = .001*vNum(v,a)*vBattery(v);
+vSOC.up(v,t,a) = 1.001*vNum(v,a)*vBattery(v);
+
+*vSOC.lo(v,t,a) = .01;
+*vSOC.up(v,t,a) = 1;
+
 TI12.lo(t)$(ord(t) gt 1) = -TI12max(t);
 TI12.up(t)$(ord(t) gt 1) = TI12max(t);
 TI13.lo(t)$(ord(t) gt 1) = -TI13max(t);
@@ -171,6 +196,7 @@ TI34.up(t)$(ord(t) gt 1) = TI34max(t);
 * Fix values for first hour, which is the last hour of the previous day
 sSOC.fx(s, t)$(ord(t) eq 1) = sInitSOC(s);
 sSOC.fx(s, t)$(ord(t) eq 49) = sSOCmax(s)/2;
+vSOC.fx(v,t,a)$(ord(t) eq 1) = vInitSOC(v,a);
 sCharge.fx(s,t)$(ord(t) eq 1) = 0;
 sDischarge.fx(s,t)$(ord(t) eq 1) = 0;
 if((sum(g, gInitGen(g)) > 0),
@@ -198,6 +224,9 @@ Equations
 * Storage constraints
          SOCc(s,t)
 
+* Vehicle constraints
+         VSOCc(v,t,a)
+
 * TCR constraints
          SUPPLYTCR1c(t)
          SUPPLYTCR2c(t)
@@ -216,11 +245,11 @@ HOURLY_COSTc(t) ..   HourlyCost(t) =e= sum(g, gLevel(g, t)*(gVC(g)) + gStartupCo
 STARTUPCOSTc(g,t) .. gStartupCost(g,t) =g= gStartupC(g)*(U(g,t) - U(g,t-1));
 
 * Load constraints for each TCR
-SUPPLYTCR1c(t)$(ord(t) gt 1) ..            loadTCR1(t) =e= sum(gTCR1, gLevel(gTCR1, t)) - TI12(t) - TI13(t) - TI15(t) + windTCR1(t) + sum(sTCR1,sDischarge(sTCR1,t)-sCharge(sTCR1,t));
-SUPPLYTCR2c(t)$(ord(t) gt 1) ..            loadTCR2(t) =e= sum(gTCR2, gLevel(gTCR2, t)) + TI12(t) + TI52(t) - TI23(t)  + windTCR2(t) + sum(sTCR2,sDischarge(sTCR2,t)-sCharge(sTCR2,t));
-SUPPLYTCR3c(t)$(ord(t) gt 1) ..            loadTCR3(t) =e= sum(gTCR3, gLevel(gTCR3, t)) + TI23(t) + TI13(t) - TI34(t)  + windTCR3(t) + sum(sTCR3,sDischarge(sTCR3,t)-sCharge(sTCR3,t));
-SUPPLYTCR4c(t)$(ord(t) gt 1) ..            loadTCR4(t) =e= sum(gTCR4, gLevel(gTCR4, t)) + TI34(t)  + windTCR4(t) + sum(sTCR4,sDischarge(sTCR4,t)-sCharge(sTCR4,t));
-SUPPLYTCR5c(t)$(ord(t) gt 1) ..            loadTCR5(t) =e= sum(gTCR5, gLevel(gTCR5, t)) + TI15(t)  + windTCR5(t) - TI52(t) + sum(sTCR5,sDischarge(sTCR5,t)-sCharge(sTCR5,t));
+SUPPLYTCR1c(t)$(ord(t) gt 1) ..            loadTCR1(t) =e= sum(gTCR1, gLevel(gTCR1, t)) - TI12(t) - TI13(t) - TI15(t) + windTCR1(t) + sum(sTCR1,sDischarge(sTCR1,t)-sCharge(sTCR1,t))-sum((v,a)$(ord(a) eq 1),vCharge(v,t,a));
+SUPPLYTCR2c(t)$(ord(t) gt 1) ..            loadTCR2(t) =e= sum(gTCR2, gLevel(gTCR2, t)) + TI12(t) + TI52(t) - TI23(t)  + windTCR2(t) + sum(sTCR2,sDischarge(sTCR2,t)-sCharge(sTCR2,t))-sum((v,a)$(ord(a) eq 2),vCharge(v,t,a));
+SUPPLYTCR3c(t)$(ord(t) gt 1) ..            loadTCR3(t) =e= sum(gTCR3, gLevel(gTCR3, t)) + TI23(t) + TI13(t) - TI34(t)  + windTCR3(t) + sum(sTCR3,sDischarge(sTCR3,t)-sCharge(sTCR3,t))-sum((v,a)$(ord(a) eq 3),vCharge(v,t,a));
+SUPPLYTCR4c(t)$(ord(t) gt 1) ..            loadTCR4(t) =e= sum(gTCR4, gLevel(gTCR4, t)) + TI34(t)  + windTCR4(t) + sum(sTCR4,sDischarge(sTCR4,t)-sCharge(sTCR4,t))-sum((v,a)$(ord(a) eq 4),vCharge(v,t,a));
+SUPPLYTCR5c(t)$(ord(t) gt 1) ..            loadTCR5(t) =e= sum(gTCR5, gLevel(gTCR5, t)) + TI15(t)  + windTCR5(t) - TI52(t) + sum(sTCR5,sDischarge(sTCR5,t)-sCharge(sTCR5,t))-sum((v,a)$(ord(a) eq 5),vCharge(v,t,a));
 
 *tempEqn(t)$(ord(t) gt 1) .. tempOutput(t) =e= sum((v,a)$(ord(a) eq 1),vCharge(v,t,a)*vNum(v,a)*vCR(v));
 
@@ -252,7 +281,11 @@ DOWNTIME3c(g,t)$(ord(t) ge card(t)-gMinDown(g)+2).. sum(tp, 1-U(g,tp)-(U(g,t-1)-
 * Storage state of charge
 SOCc(s,t)$(ord(t) gt 1) ..                sSOC(s,t) =e= sSOC(s,t-1)+ sChargeEff(s)*sCharge(s,t) - (1/sDischargeEff(s))*sDischarge(s,t);
 
+* Vehicle Constraints
+VSOCc(v,t,a)$(ord(t) gt 1) ..                vSOC(v,t,a) =e= vSOC(v,t-1,a)+ vCharge(v,t,a)- vMiles(t,v)*vNum(v,a)*vEff(v);
+
 Model PHORUM /all/;
+
 
 * Scale varibles to speed optimization
 SUPPLYTCR1c.scale(t) = 1000;
@@ -264,6 +297,10 @@ SOCc.scale(s, t) = 1000;
 OBJ_FN.scale = 10000;
 
 PHORUM.OptFile=1;
+*Option MIP = Gurobi;
 
 Solve PHORUM using MIP minimizing SysCost;
-execute_unload "results.gdx" gLevel U HourlyCost gVC TI12 TI15 TI13 TI52 TI23 TI34 sDischarge sCharge sSOC SUPPLYTCR1c.m SUPPLYTCR2c.m SUPPLYTCR3c.m SUPPLYTCR4c.m SUPPLYTCR5c.m loadTCR1 loadTCR2 loadTCR3 loadTCR4 TI12max loadTCR5 TI13max TI15max TI52max TI23max TI34max LMPTCR1actual LMPTCR2actual LMPTCR3actual LMPTCR4actual LMPTCR5actual windTCR1 windTCR2 windTCR3 windTCR4 windTCR5
+
+*execute_unload "results.gdx" gLevel U HourlyCost gVC TI12 TI15 TI13 TI52 TI23 TI34 sDischarge sCharge vSOC.l vCharge.l sSOC SUPPLYTCR1c.m SUPPLYTCR2c.m SUPPLYTCR3c.m SUPPLYTCR4c.m SUPPLYTCR5c.m loadTCR1 loadTCR2 loadTCR3 loadTCR4 TI12max loadTCR5 TI13max TI15max TI52max TI23max TI34max LMPTCR1actual LMPTCR2actual LMPTCR3actual LMPTCR4actual LMPTCR5actual
+execute_unload "results.gdx" gLevel U HourlyCost vSOC.l vCharge.l gVC TI12 TI15 TI13 TI52 TI23 TI34 sDischarge sCharge sSOC SUPPLYTCR1c.m SUPPLYTCR2c.m SUPPLYTCR3c.m SUPPLYTCR4c.m SUPPLYTCR5c.m loadTCR1 loadTCR2 loadTCR3 loadTCR4 TI12max loadTCR5 TI13max TI15max TI52max TI23max TI34max LMPTCR1actual LMPTCR2actual LMPTCR3actual LMPTCR4actual LMPTCR5actual windTCR1 windTCR2 windTCR3 windTCR4 windTCR5
+*execute_unload "results.gdx" gLevel U HourlyCost gVC TI12 TI15 TI13 TI52 TI23 TI34 SUPPLYTCR1c.m SUPPLYTCR2c.m SUPPLYTCR3c.m SUPPLYTCR4c.m SUPPLYTCR5c.m loadTCR1 loadTCR2 loadTCR3 loadTCR4 TI12max loadTCR5 TI13max TI15max TI52max TI23max TI34max

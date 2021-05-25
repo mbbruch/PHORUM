@@ -57,12 +57,20 @@ genData.gMDNOX = cell2mat(tempGenData(:,106));
 genData.gMDPM25 = cell2mat(tempGenData(:,107));
 genData.gMDPM10 = cell2mat(tempGenData(:,108));
 
+% Startup emissions
+genData.gStartupCO2 = cell2mat(tempGenData(:,111));
+genData.gStartupNOX = cell2mat(tempGenData(:,112));
+genData.gStartupSO2 = cell2mat(tempGenData(:,113));
+
+genData.gStartupMDNOX = cell2mat(tempGenData(:,117));
+genData.gStartupMDSO2 = cell2mat(tempGenData(:,118));
+
 % No load costs
 genData.gNLC = cell2mat(tempGenData(:,110));
 
 % Assign generator to a Transmission Constrained Region (TCR) based on zone
 for index = 1 : size(genData.gZone,1)
-    if(strcmp(genData.gZone(index),'AEP')) | (strcmp(genData.gZone(index),'COMED')) | (strcmp(genData.gZone(index),'APS')) | (strcmp(genData.gZone(index),'DUQ')) | (strcmp(genData.gZone(index),'DAY')) | (strcmp(genData.gZone(index),'PENELEC'))
+    if(strcmp(genData.gZone(index),'AEP')) | (strcmp(genData.gZone(index),'COMED')) | (strcmp(genData.gZone(index),'APS')) | (strcmp(genData.gZone(index),'DUQ')) | (strcmp(genData.gZone(index),'DAY')) | (strcmp(genData.gZone(index),'PENELEC'))| (strcmp(genData.gZone(index),'ATSI'))
         genData.gTCR(index,1) = 1;
     elseif(strcmp(genData.gZone(index),'BGE')) | (strcmp(genData.gZone(index),'PEPCO'))
         genData.gTCR(index,1) = 2;
@@ -138,6 +146,11 @@ loadData.WEC = cell2mat(imports(:,24));
 % Wind gen
 loadData.windTCR1 = cell2mat(wind(:,4));
 loadData.windTCR3 = cell2mat(wind(:,5));
+loadData.windMaxTCR1 = cell2mat(wind(:,4));
+loadData.windMaxTCR2 = cell2mat(wind(:,5));
+loadData.windMaxTCR3 = cell2mat(wind(:,6));
+loadData.windMaxTCR4 = cell2mat(wind(:,7));
+loadData.windMaxTCR5 = cell2mat(wind(:,8));
 
 % Transmission constraints
 loadData.EImax = cell2mat(transmissionConstraints(:,4));

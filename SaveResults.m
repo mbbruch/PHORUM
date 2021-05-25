@@ -1,5 +1,5 @@
 % PHORUM (PJM Hourly Open-source Reduced-form Unit commitment Model) 
-% Copyright (C) 2013  Roger Lueken
+% Copyright (C) 2013  Roger Lueken, 2016 Allison Weis
 % SaveResults.m
 % 
 % This program is free software: you can redistribute it and/or modify
@@ -184,6 +184,12 @@ if settings.tLevel == 1
     outputsHourly.TI34 = totalResults.tLevelTI34;
 end
 
+% vehicle outputs
+if settings.isEVanalysis == 1
+%    outputsHourly.vSOC = totalResults.vSOC;
+    outputsHourly.vCharge = totalResults.vCharge;
+end
+
 %% Daily output structure
 
 outputsDaily.day = totalResults.date;
@@ -229,6 +235,11 @@ if (settings.wind == 2)
     outputsDaily.windTCR4 = totalResults.windTCR4;
     outputsDaily.windTCR5 = totalResults.windTCR5;
 end
+if (settings.isEVanalysis == 1)
+    outputsDaily.vCharge = totalResults.vCharge;
+    outputsDaily.vDischarge = totalResults.vDischarge;
+end
+
 % Total output structure
 
 if (settings.systemCosts == 3),     outputsTotal.sysCost = tSysCost; end

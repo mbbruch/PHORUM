@@ -1,5 +1,5 @@
 % PHORUM (PJM Hourly Open-source Reduced-form Unit commitment Model) 
-% Copyright (C) 2013  Roger Lueken
+% Copyright (C) 2013  Roger Lueken, 2016 Allison Weis
 % CreateGDX.m
 % 
 % This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 % 5000 Forbes Avenue
 % Pittsburgh, PA 15213
 
-function [results] = CreateGDX(day, PHORUMdata, settings, prevDayResults, optWindow)
+function totalLoad = CreateGDX(day, PHORUMdata, settings, prevDayResults, optWindow,totalLoad)
 %% Settings
 EAFderating = 0.5;
 
@@ -31,7 +31,6 @@ EAFderating = 0.5;
 genData = PHORUMdata.genData;
 loadData = PHORUMdata.loadData;
 storageData = PHORUMdata.storageData;
-windData = PHORUMdata.windData;
 
 %% Load needed genData to memory
 
@@ -390,33 +389,12 @@ OVEC = loadData.OVEC(tStart:tEnd);
 TVA = loadData.TVA(tStart:tEnd);
 WEC = loadData.WEC(tStart:tEnd);
 
-% Select appropriate wind scenario
-if settings.isWindBase2010 == 1
-    windMaxTCR1 = windData.windBaseCase2010(tStart:tEnd, 1);
-    windMaxTCR2 = windData.windBaseCase2010(tStart:tEnd, 2);
-    windMaxTCR3 = windData.windBaseCase2010(tStart:tEnd, 3);
-    windMaxTCR4 = windData.windBaseCase2010(tStart:tEnd, 4);
-    windMaxTCR5 = windData.windBaseCase2010(tStart:tEnd, 5);
-elseif settings.isWind10INIL == 1
-    windMaxTCR1 = windData.windData10INIL(tStart:tEnd, 1);
-    windMaxTCR2 = windData.windData10INIL(tStart:tEnd, 2);
-    windMaxTCR3 = windData.windData10INIL(tStart:tEnd, 3);
-    windMaxTCR4 = windData.windData10INIL(tStart:tEnd, 4);
-    windMaxTCR5 = windData.windData10INIL(tStart:tEnd, 5);
-elseif settings.isWind20INIL == 1
-    windMaxTCR1 = windData.windData20INIL(tStart:tEnd, 1);
-    windMaxTCR2 = windData.windData20INIL(tStart:tEnd, 2);
-    windMaxTCR3 = windData.windData20INIL(tStart:tEnd, 3);
-    windMaxTCR4 = windData.windData20INIL(tStart:tEnd, 4);
-    windMaxTCR5 = windData.windData20INIL(tStart:tEnd, 5);
-elseif settings.isWind10 == 1
-    windMaxTCR1 = windData.windData10(tStart:tEnd, 1);
-    windMaxTCR2 = windData.windData10(tStart:tEnd, 2);
-    windMaxTCR3 = windData.windData10(tStart:tEnd, 3);
-    windMaxTCR4 = windData.windData10(tStart:tEnd, 4);
-    windMaxTCR5 = windData.windData10(tStart:tEnd, 5);    
-end
-    
+% Wind gen
+windMaxTCR1 = loadData.windMaxTCR1(tStart:tEnd);
+windMaxTCR2 = loadData.windMaxTCR2(tStart:tEnd);
+windMaxTCR3 = loadData.windMaxTCR3(tStart:tEnd);
+windMaxTCR4 = loadData.windMaxTCR4(tStart:tEnd);
+windMaxTCR5 = loadData.windMaxTCR5(tStart:tEnd);
 
 % Assign imports to zones
 AEP = AEP - (ALTE + ALTW + AMIL + CPLW + CWLP + DUK + EKPC + IPL + LGEE + MEC + MECS + NIPS + OVEC + TVA + WEC);
@@ -444,7 +422,7 @@ loadTCR5 = loadTCR5 + 1170;
 
 % TEMP set loadTCR1 to 1
 %loadTCR1 = loadTCR1*0+1000;
-
+totalLoad = [totalLoad;loadTCR1(1:24)+loadTCR2(1:24)+loadTCR3(1:24)+loadTCR4(1:24)+loadTCR5(1:24)];
 
 % Transmission constraints
 EImax = loadData.EImax(tStart:tEnd);
@@ -780,5 +758,88 @@ sInitSOCGDX.dim = 2;
 
 wgdx('StorageData', storsGDX, storsTCR1GDX, storsTCR2GDX, storsTCR3GDX, storsTCR4GDX, storsTCR5GDX, sRampRateGDX, sSOCmaxGDX, sChargeEffGDX, sDischargeEffGDX, sVCGDX, sInitSOCGDX);
 
-end
+
+if settings.isEVanalysis == 1
+    % new code
+    vehTCR1 = [];
+    vehTCR2 = [];
+    vehTCR3 = [];
+    vehTCR4 = [];
+    vehTCR5 = [];
     
+    load('EVdata')
+
+    % Set initial SOC.  If this is the first day, set equal to 1/2 capacity.
+    % If this is not the first day, use results from the previous day.
+    if isempty(prevDayResults.vInitSOC)
+        vInitSOC = EVdata.prevSOC;
+    else
+        vInitSOC = prevDayResults.vInitSOC;
+    end
+
+    for v = 1 : length(EVdata.number(:,1))
+        vehProfiles{v} = strcat('v',num2str(v));
+    end
+    vehiclesGDX.name = 'v';
+    vehiclesGDX.type = 'set';
+    vehiclesGDX.uels = vehProfiles;
+
+    for a = 1 : length(EVdata.number(1,:))
+        transAreas{a} = strcat('a',num2str(a));
+    end
+    areasGDX.name = 'a';
+    areasGDX.type = 'set';
+    areasGDX.uels = transAreas;
+
+    vMilesGDX.name = 'vMiles';
+    vMilesGDX.type = 'parameter';
+    vMilesGDX.val = EVdata.miles(tStart:tEnd,:);
+    vMilesGDX.uels = {timeVars,vehProfiles}; 
+    vMilesGDX.form = 'full';
+    vMilesGDX.dim = 2;
+
+    vAvailableGDX.name = 'vAvailable';
+    vAvailableGDX.type = 'parameter';
+    vAvailableGDX.val = EVdata.available(tStart:tEnd,:);
+    vAvailableGDX.uels = {timeVars,vehProfiles}; 
+    vAvailableGDX.form = 'full';
+    vAvailableGDX.dim = 2;
+
+    vNumGDX.name = 'vNum';
+    vNumGDX.type = 'parameter';
+    vNumGDX.val = EVdata.number;
+    vNumGDX.uels = {vehProfiles,transAreas}; 
+    vNumGDX.form = 'full';
+    vNumGDX.dim = 2;
+
+    vInitSOCGDX.name = 'vInitSOC';
+    vInitSOCGDX.type = 'parameter';
+    vInitSOCGDX.val = vInitSOC;
+    vInitSOCGDX.uels = {vehProfiles,transAreas}; 
+    vInitSOCGDX.form = 'full';
+    vInitSOCGDX.dim = 2;
+
+    vBatteryGDX.name = 'vBattery';
+    vBatteryGDX.type = 'parameter';
+    vBatteryGDX.val = EVdata.vBattery;
+    vBatteryGDX.uels = vehProfiles;
+    vBatteryGDX.form = 'full';
+    vBatteryGDX.dim = 2;
+
+    vCRGDX.name = 'vCR';
+    vCRGDX.type = 'parameter';
+    vCRGDX.val = EVdata.vCR;
+    vCRGDX.uels = vehProfiles;
+    vCRGDX.form = 'full';
+    vCRGDX.dim = 2;
+
+    vEffGDX.name = 'vEff';
+    vEffGDX.type = 'parameter';
+    vEffGDX.val = EVdata.vEff;
+    vEffGDX.uels = vehProfiles;
+    vEffGDX.form = 'full';
+    vEffGDX.dim = 2;
+
+    wgdx('VehData',vehiclesGDX, areasGDX,vMilesGDX,vAvailableGDX,vNumGDX,vInitSOCGDX,vBatteryGDX,vCRGDX,vEffGDX)
+end
+end
