@@ -1,5 +1,5 @@
 * PHORUM (PJM Hourly Open-source Reduced-form Unit commitment Model)
-* Copyright (C) 2013  Roger Lueken, 2016 Allison Weis
+* Copyright (C) 2013  Roger Lueken, 2016 Allison Weis, 2021 Matthew Bruchon
 * PHORUMGAMS.gms
 *
 * This program is free software: you can redistribute it and/or modify
@@ -48,7 +48,7 @@ Parameter windMaxTCR3(t);
 Parameter windMaxTCR4(t);
 Parameter windMaxTCR5(t);
 $LOAD t loadTCR1 loadTCR2 loadTCR3 loadTCR4 loadTCR5 TI12max TI13max TI15max TI52max TI23max TI34max LMPTCR1actual LMPTCR2actual LMPTCR3actual LMPTCR4actual LMPTCR5actual windMaxTCR1 windMaxTCR2 windMaxTCR3 windMaxTCR4 windMaxTCR5
-
+Parameter gap;
 $GDXIN VehData.gdx
 set v "vehicle profile";
 set a "transmission area";
@@ -64,6 +64,9 @@ $LOAD v a vAvailable vMiles vNum vInitSOC vBattery vCR vEff
 
 set tOpt(t) "optimization periods";
 alias (t, tp);
+
+set fct(v,t) /v1.t14,v2.t11,v3.t8,v4.t9,v5.t25,v6.t17,v7.t14,v8.t7,v9.t9,v10.t9,v11.t10,v12.t9,v13.t25,v14.t9,v15.t19
+v1.t38,v2.t35,v3.t32,v4.t33,v5.t49,v6.t41,v7.t38,v8.t31,v9.t33,v10.t33,v11.t34,v12.t33,v13.t49,v14.t33,v15.t43  /;
 
 * Gather generator data
 $GDXIN GenData.gdx
@@ -226,6 +229,7 @@ Equations
 
 * Vehicle constraints
          VSOCc(v,t,a)
+         VFULLYCHARGE(v,t,a)
 
 * TCR constraints
          SUPPLYTCR1c(t)
@@ -272,7 +276,6 @@ RAMPDOWNc(g,t)$(ord(t) gt 1) .. gLevel(g,t-1) - gLevel(g,t) =l= gRampRate(g)*U(g
 UPTIME1c(g,t)$(ord(t) gt 1 and ord(t) le gOntime(g)*gInitState(g)).. sum(tp, 1 - U(g,tp)) =e= 0;
 UPTIME2c(g,t)$(ord(t) gt gOntime(g)*gInitState(g)+1).. sum(tp,U(g,tp)) =g= gMinUp(g)*(U(g,t) - U(g,t-1));
 UPTIME3c(g,t)$(ord(t) ge card(t)-gMinUp(g)+2).. sum(tp, U(g,tp)-(U(g,t)-U(g,t-1))) =g= 0;
-
 * Min downtime
 DOWNTIME1c(g,t)$(ord(t) gt 1 and ord(t)le gDowntime(g)*(1-gInitState(g))).. sum(tp, U(g,tp)) =e= 0;
 DOWNTIME2c(g,t)$(ord(t) gt gDowntime(g)*(1-gInitState(g))+1).. sum(tp,1-U(g,tp)) =g= gMinDown(g)*(U(g,t-1) - U(g,t));
@@ -282,7 +285,8 @@ DOWNTIME3c(g,t)$(ord(t) ge card(t)-gMinDown(g)+2).. sum(tp, 1-U(g,tp)-(U(g,t-1)-
 SOCc(s,t)$(ord(t) gt 1) ..                sSOC(s,t) =e= sSOC(s,t-1)+ sChargeEff(s)*sCharge(s,t) - (1/sDischargeEff(s))*sDischarge(s,t);
 
 * Vehicle Constraints
-VSOCc(v,t,a)$(ord(t) gt 1) ..                vSOC(v,t,a) =e= vSOC(v,t-1,a)+ vCharge(v,t,a)- vMiles(t,v)*vNum(v,a)*vEff(v);
+VSOCc(v,t,a)$(ord(t) gt 1) ..                vSOC(v,t,a) =e= vSOC(v,t-1,a)+ vCharge(v,t,a)*.85- vMiles(t,v)*vNum(v,a)*vEff(v);
+VFULLYCHARGE(v,t,a)$fct(v,t)..               vSOC(v,t,a) =e= 1.001*vNum(v,a)*vBattery(v);
 
 Model PHORUM /all/;
 
@@ -297,10 +301,17 @@ SOCc.scale(s, t) = 1000;
 OBJ_FN.scale = 10000;
 
 PHORUM.OptFile=1;
-*Option MIP = Gurobi;
+Option MIP = CPLEX; 
+* writemps = U:\PJM\ControlledCharging\out.mps * names = yes
+* Option MIP = OSIGUROBI;
+Option Threads = 4;
+Option OptCR = 0.0001;
+Option OptCA = 0.0001;
 
 Solve PHORUM using MIP minimizing SysCost;
 
+gap =  abs(PHORUM.objest - PHORUM.objval)/(1e-10+abs(PHORUM.objval));
+
 *execute_unload "results.gdx" gLevel U HourlyCost gVC TI12 TI15 TI13 TI52 TI23 TI34 sDischarge sCharge vSOC.l vCharge.l sSOC SUPPLYTCR1c.m SUPPLYTCR2c.m SUPPLYTCR3c.m SUPPLYTCR4c.m SUPPLYTCR5c.m loadTCR1 loadTCR2 loadTCR3 loadTCR4 TI12max loadTCR5 TI13max TI15max TI52max TI23max TI34max LMPTCR1actual LMPTCR2actual LMPTCR3actual LMPTCR4actual LMPTCR5actual
-execute_unload "results.gdx" gLevel U HourlyCost vSOC.l vCharge.l gVC TI12 TI15 TI13 TI52 TI23 TI34 sDischarge sCharge sSOC SUPPLYTCR1c.m SUPPLYTCR2c.m SUPPLYTCR3c.m SUPPLYTCR4c.m SUPPLYTCR5c.m loadTCR1 loadTCR2 loadTCR3 loadTCR4 TI12max loadTCR5 TI13max TI15max TI52max TI23max TI34max LMPTCR1actual LMPTCR2actual LMPTCR3actual LMPTCR4actual LMPTCR5actual windTCR1 windTCR2 windTCR3 windTCR4 windTCR5
+execute_unload "results.gdx" SysCost U gap gLevel U HourlyCost vSOC.l vCharge.l gVC TI12 TI15 TI13 TI52 TI23 TI34 sDischarge sCharge sSOC SUPPLYTCR1c.m SUPPLYTCR2c.m SUPPLYTCR3c.m SUPPLYTCR4c.m SUPPLYTCR5c.m loadTCR1 loadTCR2 loadTCR3 loadTCR4 TI12max loadTCR5 TI13max TI15max TI52max TI23max TI34max LMPTCR1actual LMPTCR2actual LMPTCR3actual LMPTCR4actual LMPTCR5actual windTCR1 windTCR2 windTCR3 windTCR4 windTCR5
 *execute_unload "results.gdx" gLevel U HourlyCost gVC TI12 TI15 TI13 TI52 TI23 TI34 SUPPLYTCR1c.m SUPPLYTCR2c.m SUPPLYTCR3c.m SUPPLYTCR4c.m SUPPLYTCR5c.m loadTCR1 loadTCR2 loadTCR3 loadTCR4 TI12max loadTCR5 TI13max TI15max TI52max TI23max TI34max
