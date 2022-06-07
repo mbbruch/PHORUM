@@ -1,0 +1,56 @@
+state_name,state_abbr,fips2,census_region
+Alabama,AL,01,East South Central
+Alaska,AK,02,Pacific Noncontiguous
+Arizona,AZ,04,Mountain
+Arkansas,AR,05,West South Central
+California,CA,06,Pacific Contiguous
+Colorado,CO,08,Mountain
+Connecticut,CT,09,New England
+Delaware,DE,10,South Atlantic
+Florida,FL,12,South Atlantic
+Georgia,GA,13,South Atlantic
+Hawaii,HI,15,Pacific Noncontiguous
+Idaho,ID,16,Mountain
+Illinois,IL,17,East North Central
+Indiana,IN,18,East North Central
+Iowa,IA,19,West North Central
+Kansas,KS,20,West North Central
+Kentucky,KY,21,East South Central
+Louisiana,LA,22,West South Central
+Maine,ME,23,New England
+Maryland,MD,24,South Atlantic
+Massachusetts,MA,25,New England
+Michigan,MI,26,East North Central
+Minnesota,MN,27,West North Central
+Mississippi,MS,28,East South Central
+Missouri,MO,29,West North Central
+Montana,MT,30,Mountain
+Nebraska,NE,31,West North Central
+Nevada,NV,32,Mountain
+New Hampshire,NH,33,New England
+New Jersey,NJ,34,Middle Atlantic
+New Mexico,NM,35,Mountain
+New York,NY,36,Middle Atlantic
+North Carolina,NC,37,South Atlantic
+North Dakota,ND,38,West North Central
+Ohio,OH,39,East North Central
+Oklahoma,OK,40,West South Central
+Oregon,OR,41,Pacific Contiguous
+Pennsylvania,PA,42,Middle Atlantic
+Rhode Island,RI,44,New England
+South Carolina,SC,45,South Atlantic
+South Dakota,SD,46,West North Central
+Tennessee,TN,47,East South Central
+Texas,TX,48,West South Central
+Utah,UT,49,Mountain
+Vermont,VT,50,New England
+Virginia,VA,51,South Atlantic
+Washington,WA,53,Pacific Contiguous
+West Virginia,WV,54,South Atlantic
+Wisconsin,WI,55,East North Central
+Wyoming,WY,56,Mountain
+American Samoa,AS,60,NA
+Guam,GU,66,NA
+Northern Mariana Islands,MP,69,NA
+Puerto Rico,PR,72,NA
+Virgin Islands,VI,78,NA

@@ -1,29 +1,4 @@
-% PHORUM (PJM Hourly Open-source Reduced-form Unit commitment Model) 
-% Copyright (C) 2013  Roger Lueken, 2016 Allison Weis
-% CreateGDX.m
-% 
-% This program is free software: you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-% 
-% This program is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details.
-
-% You should have received a copy of the GNU General Public License
-% along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-% You can contact the author at rlueken@gmail.com, or mail to:
-% Roger Lueken
-% Department of Engineering and Public Policy
-% Carnegie Mellon University
-% Baker Hall 129
-% 5000 Forbes Avenue
-% Pittsburgh, PA 15213
-
-function totalLoad = CreateGDX(day, PHORUMdata, settings, prevDayResults, optWindow,totalLoad)
+function CreateGDX(day, PHORUMdata, settings, prevDayResults, EVdata, dirString)
 %% Settings
 EAFderating = 0.5;
 
@@ -32,123 +7,84 @@ genData = PHORUMdata.genData;
 loadData = PHORUMdata.loadData;
 storageData = PHORUMdata.storageData;
 
-%% Load needed genData to memory
-
 % Set range of modeled hours based on starting day
 tStart = day * 24 + 1 - 24;
-tEnd = tStart + (optWindow - 1);
+tEnd = tStart + (settings.optWindow - 1);
 
 % Assign summer/winter capacity based on start date
 if tStart > 2900 && tStart < 6588
-    gCapacity = genData.gCapacitySummer;
+    Capacity = genData.CapacitySummer;
 else
-    gCapacity = genData.gCapacityWinter;
+    Capacity = genData.CapacityWinter;
 end
-gHeatRate = genData.gHeatRate;
-gVarOM = genData.gVarOM;
-gRampRate = genData.gRampRate;
-gMinUp = genData.gMinUp;
-gMinDown = genData.gMinDown;
-gNLC = genData.gNLC;
-gTCR = genData.gTCR;
-
-% Emission rates (lb/MWh)
-gNOX = genData.gNOX;
-gSO2 = genData.gSO2;
-gN2O = genData.gN2O;
-gCO2 = genData.gCO2;
-gCO2eqv = genData.gCO2eqv;
-gCO = genData.gCO;
-gNH3 = genData.gNH3;
-gPM10 = genData.gPM10;
-gPM25 = genData.gPM25;
-gVOC = genData.gVOC;
-
-% Startup emissions (tons)
-gStartupNOX = genData.gStartupNOX;
-gStartupCO2 = genData.gStartupCO2;
-gStartupSO2 = genData.gStartupSO2;
-
-
-% Marginal Damages ($2010/MWh)
-gMDNH3 = genData.gMDNH3;
-gMDSO2 = genData.gMDSO2;
-gMDVOC = genData.gMDVOC;
-gMDNOX = genData.gMDNOX;
-gMDPM25 = genData.gMDPM25;
-gMDPM10 = genData.gMDPM10;
-gStartupMDNOX = genData.gStartupMDNOX;
-gStartupMDSO2 = genData.gStartupMDSO2;
 
 % Assign fuel costs and EAF based on start date
 if (tStart >=1 && tStart < 745)        % Jan
-    gFuelPrice = genData.gFuelPrice(:,1); 
-    gEAF = genData.gEAF(:,1);
+    FuelPrice = genData.FuelPrice(:,1); 
+    EAF = genData.EAF(:,1);
 end
 if (tStart >=745 && tStart < 1417)     % Feb
-    gFuelPrice = genData.gFuelPrice(:,2); 
-    gEAF = genData.gEAF(:,2);
+    FuelPrice = genData.FuelPrice(:,2); 
+    EAF = genData.EAF(:,2);
 end
 if (tStart >=1417 && tStart < 2161)    % Mar 
-    gFuelPrice = genData.gFuelPrice(:,3); 
-    gEAF = genData.gEAF(:,3);
+    FuelPrice = genData.FuelPrice(:,3); 
+    EAF = genData.EAF(:,3);
 end
 if (tStart >=2161 && tStart < 2881)    % Apr
-    gFuelPrice = genData.gFuelPrice(:,4); 
-    gEAF = genData.gEAF(:,4);
+    FuelPrice = genData.FuelPrice(:,4); 
+    EAF = genData.EAF(:,4);
 end
 if (tStart >=2881 && tStart < 3625)    % May
-    gFuelPrice = genData.gFuelPrice(:,5); 
-    gEAF = genData.gEAF(:,5);
+    FuelPrice = genData.FuelPrice(:,5); 
+    EAF = genData.EAF(:,5);
 end
 if (tStart >=3625 && tStart < 4345)    % June
-    gFuelPrice = genData.gFuelPrice(:,6); 
-    gEAF = genData.gEAF(:,6);
+    FuelPrice = genData.FuelPrice(:,6); 
+    EAF = genData.EAF(:,6);
 end
 if (tStart >=4345 && tStart < 5089)    % July
-    gFuelPrice = genData.gFuelPrice(:,7); 
-    gEAF = genData.gEAF(:,7);
+    FuelPrice = genData.FuelPrice(:,7); 
+    EAF = genData.EAF(:,7);
 end
 if (tStart >=5089 && tStart < 5833)    % Aug
-    gFuelPrice = genData.gFuelPrice(:,8); 
-    gEAF = genData.gEAF(:,8);
+    FuelPrice = genData.FuelPrice(:,8); 
+    EAF = genData.EAF(:,8);
 end
 if (tStart >=5833 && tStart < 6553)    % Sept
-    gFuelPrice = genData.gFuelPrice(:,9); 
-    gEAF = genData.gEAF(:,9);
+    FuelPrice = genData.FuelPrice(:,9); 
+    EAF = genData.EAF(:,9);
 end
 if (tStart >=6553 && tStart < 7297)    % Oct
-    gFuelPrice = genData.gFuelPrice(:,10); 
-    gEAF = genData.gEAF(:,10);
+    FuelPrice = genData.FuelPrice(:,10); 
+    EAF = genData.EAF(:,10);
 end
 if (tStart >=7297 && tStart < 8017)    % Nov
-    gFuelPrice = genData.gFuelPrice(:,11); 
-    gEAF = genData.gEAF(:,11);
+    FuelPrice = genData.FuelPrice(:,11); 
+    EAF = genData.EAF(:,11);
 end
 if (tStart >=8017)                     % Dec
-    gFuelPrice = genData.gFuelPrice(:,12);      
-    gEAF = genData.gEAF(:,12);
+    FuelPrice = genData.FuelPrice(:,12);      
+    EAF = genData.EAF(:,12);
 end               
 
 % Apply EAF derating
-gEAF = gEAF + (1 - gEAF).*EAFderating;
-gCapacity = gCapacity .* gEAF;
-gMin = genData.gMin.*gCapacity;
-
+EAF = EAF/100;
+EAF = EAF + (1 - EAF).*EAFderating;
+Capacity = Capacity .* EAF;
 % Calculate variable cost.  Include emission prices and marginal damages as 
-% specified by settings. Also include 10% cost adder on fuel price and 
-% variable O&M as allowed by PJM.
-gEmissionPrice = (gNOX*settings.priceNOX + gSO2*settings.priceSO2 + gN2O*settings.priceN2O + gCO2*settings.priceCO2 + gCO2eqv*settings.priceCO2eqv + gCO*settings.priceCO + gNH3*settings.priceNH3 + gPM10*settings.pricePM10 + gPM25*settings.pricePM25 + gVOC*settings.priceVOC)/2000;
-gMDPrice = gMDNH3*settings.isMDNH3 + gMDSO2*settings.isMDSO2 + gMDVOC*settings.isMDVOC + gMDNOX*settings.isMDNOX + gMDPM25*settings.isMDPM25 + gMDPM10*settings.isMDPM10;
+% specified by settings. Also include 10% cost adder on fuel price and variable O&M as allowed by PJM.
+VC = 1.1*(genData.HeatRate.*FuelPrice + genData.VarOM);
 
-gVC = 1.1*(gHeatRate.*gFuelPrice + gVarOM) + gEmissionPrice + gMDPrice;
+StartupCost = genData.StartupCost;
 
-% Calculate startup costs.  Include emission prices and marginal damages as
-% specified by settings.
-
-gStartupEmissionPrice = (gStartupNOX*settings.priceNOX + gStartupSO2*settings.priceSO2 + gStartupCO2*settings.priceCO2);
-gStartupMDPrice = gStartupMDNOX*settings.isMDNOX + gStartupMDSO2*settings.isMDSO2;
-gStartupCost = genData.gStartupCost + gStartupEmissionPrice + gStartupMDPrice;
+if settings.isEmissionsPrice == 1
+    EmissionPrice = (genData.NOX*settings.priceNOX + genData.SO2*settings.priceSO2 + genData.N2O*settings.priceN2O + genData.CO2*settings.priceCO2 + genData.CO2eqv*settings.priceCO2eqv + genData.CO*settings.priceCO + genDta.NH3*settings.priceNH3 + genData.PM10*settings.pricePM10 + genData.PM25*settings.pricePM25 + genData.VOC*settings.priceVOC)/2000;
+    MDPrice = genData.MDNH3*settings.isMDNH3 + genData.MDSO2*settings.isMDSO2 + genData.MDVOC*settings.isMDVOC + genData.MDNOX*settings.isMDNOX + genData.MDPM25*settings.isMDPM25 + genData.MDPM10*settings.isMDPM10;
+    StartupEmissionPrice = (genData.StartupNOX*settings.priceNOX + genData.StartupSO2*settings.priceSO2 + genData.StartupCO2*settings.priceCO2);
+    StartupCost = StartupCost + genData.StartupEmissionPrice + genData.StartupMDNOX*settings.isMDNOX + genData.StartupMDSO2*settings.isMDSO2;
+    VC = VC + EmissionPrice + StartupEmissionPrice + MDPrice;
+end
 
 %% Create generator GDX files
 
@@ -164,21 +100,21 @@ countTCR2 = 1;
 countTCR3 = 1;
 countTCR4 = 1;
 countTCR5 = 1;
-for g = 1 : size(gTCR,1)
+for g = 1 : size(genData.TCR,1)
     gens{g} = strcat('g',num2str(g));
-    if gTCR(g) == 1 
+    if genData.TCR(g) == 1 
         gensTCR1{countTCR1} = strcat('g',num2str(g));
         countTCR1 = countTCR1+1;
-    elseif gTCR(g) == 2 
+    elseif genData.TCR(g) == 2 
         gensTCR2{countTCR2} = strcat('g',num2str(g));
         countTCR2 = countTCR2+1;
-    elseif gTCR(g) == 3 
+    elseif genData.TCR(g) == 3 
         gensTCR3{countTCR3} = strcat('g',num2str(g));
         countTCR3 = countTCR3+1;
-    elseif gTCR(g) == 4 
+    elseif genData.TCR(g) == 4 
         gensTCR4{countTCR4} = strcat('g',num2str(g));
         countTCR4 = countTCR4+1;
-    elseif gTCR(g) == 5 
+    elseif genData.TCR(g) == 5 
         gensTCR5{countTCR5} = strcat('g',num2str(g));
         countTCR5 = countTCR5+1;
     end
@@ -209,233 +145,212 @@ gensTCR5GDX.name = 'gTCR5';
 gensTCR5GDX.type = 'set';
 gensTCR5GDX.uels = gensTCR5;
 
-gCapacityGDX.name = 'gCapacity';
-gCapacityGDX.type = 'parameter';
-gCapacityGDX.uels = gens;
-gCapacityGDX.form = 'full';
-gCapacityGDX.dim = 2;
-gCapacityGDX.val = gCapacity;
+CapacityGDX.name = 'gCapacity';
+CapacityGDX.type = 'parameter';
+CapacityGDX.uels = gens;
+CapacityGDX.form = 'full';
+CapacityGDX.dim = 1;
+CapacityGDX.val = Capacity;
 
-gRampRateGDX.name = 'gRampRate';
-gRampRateGDX.type = 'parameter';
-gRampRateGDX.uels = gens;
-gRampRateGDX.form = 'full';
-gRampRateGDX.dim = 1;
-gRampRateGDX.val = gRampRate;
+RampRateGDX.name = 'gRampRate';
+RampRateGDX.type = 'parameter';
+RampRateGDX.uels = gens;
+RampRateGDX.form = 'full';
+RampRateGDX.dim = 1;
+RampRateGDX.val = genData.RampRate;
 
-gMinCapacityGDX.name = 'gMinCapacity';
-gMinCapacityGDX.type = 'parameter';
-gMinCapacityGDX.uels = gens;
-gMinCapacityGDX.form = 'full';
-gMinCapacityGDX.dim = 2;
-gMinCapacityGDX.val = gMin;
+MinCapacityGDX.name = 'gMinCapacity';
+MinCapacityGDX.type = 'parameter';
+MinCapacityGDX.uels = gens;
+MinCapacityGDX.form = 'full';
+MinCapacityGDX.dim = 1;
+MinCapacityGDX.val = genData.Min.*Capacity;
 
-gMinUpGDX.name = 'gMinUp';
-gMinUpGDX.type = 'parameter';
-gMinUpGDX.uels = gens;
-gMinUpGDX.form = 'full';
-gMinUpGDX.dim = 2;
-gMinUpGDX.val = gMinUp;
+MinUpGDX.name = 'gMinUp';
+MinUpGDX.type = 'parameter';
+MinUpGDX.uels = gens;
+MinUpGDX.form = 'full';
+MinUpGDX.dim = 1;
+MinUpGDX.val = genData.MinUp;
 
-gMinDownGDX.name = 'gMinDown';
-gMinDownGDX.type = 'parameter';
-gMinDownGDX.uels = gens;
-gMinDownGDX.form = 'full';
-gMinDownGDX.dim = 2;
-gMinDownGDX.val = gMinDown;
+MinDownGDX.name = 'gMinDown';
+MinDownGDX.type = 'parameter';
+MinDownGDX.uels = gens;
+MinDownGDX.form = 'full';
+MinDownGDX.dim = 1;
+MinDownGDX.val = genData.MinDown;
 
-gStartupCostGDX.name = 'gStartupC';
-gStartupCostGDX.type = 'parameter';
-gStartupCostGDX.uels = gens;
-gStartupCostGDX.form = 'full';
-gStartupCostGDX.dim = 2;
-gStartupCostGDX.val = gStartupCost;
+StartupCostGDX.name = 'gStartupC';
+StartupCostGDX.type = 'parameter';
+StartupCostGDX.uels = gens;
+StartupCostGDX.form = 'full';
+StartupCostGDX.dim = 1;
+StartupCostGDX.val = StartupCost;
 
-gVCGDX.name = 'gVC';
-gVCGDX.type = 'parameter';
-gVCGDX.uels = gens;
-gVCGDX.form = 'full';
-gVCGDX.dim = 2;
-gVCGDX.val = gVC;
+VCGDX.name = 'gVC';
+VCGDX.type = 'parameter';
+VCGDX.uels = gens;
+VCGDX.form = 'full';
+VCGDX.dim = 1;
+VCGDX.val = VC;
 
-gNLCGDX.name = 'gNLC';
-gNLCGDX.type = 'parameter';
-gNLCGDX.uels = gens;
-gNLCGDX.form = 'full';
-gNLCGDX.dim = 2;
-gNLCGDX.val = gNLC;
+NLCGDX.name = 'gNLC';
+NLCGDX.type = 'parameter';
+NLCGDX.uels = gens;
+NLCGDX.form = 'full';
+NLCGDX.dim = 1;
+NLCGDX.val = genData.NLC;
+if settings.isEmissionsPrice == 1
+	emissionRate.name = 'emissionRate';
+	emissionRate.type = 'parameter';
+	emissionRate.uels = gens;
+	emissionRate.form = 'full';
+	emissionRate.dim = 1;
+	emissionRate.val = genData.CO2;
+end
 
 % Calculate initial state and runtime/offtime from previous run.  Load to
 % GDX.
-gOntime = prevDayResults.gOntime;
-gDowntime = prevDayResults.gDowntime;
-gInitGen = prevDayResults.gInitGen;
-gInitState = prevDayResults.gInitState;
+Ontime = prevDayResults.Ontime;
+Downtime = prevDayResults.Downtime;
+InitGen = prevDayResults.InitGen;
+InitState = prevDayResults.InitState;
 
-if isempty(gOntime)
-    gOntime = zeros(length(gCapacity),1);
+if isempty(Ontime)
+    Ontime = zeros(length(Capacity),1);
 else
-    for index = 1 : length(gOntime)
-        if gOntime(index) ~= 0
-            gOntime(index) = gMinUp(index) - gOntime(index);
-            if gOntime(index) < 0
-                gOntime(index) = 0;
+    for index = 1 : length(Ontime)
+        if Ontime(index) ~= 0
+            Ontime(index) = genData.MinUp(index) - Ontime(index);
+            if Ontime(index) < 0
+                Ontime(index) = 0;
             end
         end
     end
 end
-if isempty(gDowntime)
-    gDowntime = zeros(length(gCapacity),1);
+if isempty(Downtime)
+    Downtime = zeros(length(Capacity),1);
 else
-    for index = 1 : length(gDowntime)
-        if gDowntime(index) ~= 0
-            gDowntime(index) = gMinDown(index) - gDowntime(index);
-            if gDowntime(index) < 0
-                gDowntime(index) = 0;
+    for index = 1 : length(Downtime)
+        if Downtime(index) ~= 0
+            Downtime(index) = genData.MinDown(index) - Downtime(index);
+            if Downtime(index) < 0
+                Downtime(index) = 0;
             end
         end
     end
 end
 
-gOntimeGDX.name = 'gOntime';
-gOntimeGDX.type = 'parameter';
-gOntimeGDX.uels = gens;
-gOntimeGDX.form = 'full';
-gOntimeGDX.dim = 2;
-gOntimeGDX.val = gOntime;
+OntimeGDX.name = 'gOntime';
+OntimeGDX.type = 'parameter';
+OntimeGDX.uels = gens;
+OntimeGDX.form = 'full';
+OntimeGDX.dim = 1;
+OntimeGDX.val = Ontime;
 
-gDowntimeGDX.name = 'gDowntime';
-gDowntimeGDX.type = 'parameter';
-gDowntimeGDX.uels = gens;
-gDowntimeGDX.form = 'full';
-gDowntimeGDX.dim = 2;
-gDowntimeGDX.val = gDowntime;
+DowntimeGDX.name = 'gDowntime';
+DowntimeGDX.type = 'parameter';
+DowntimeGDX.uels = gens;
+DowntimeGDX.form = 'full';
+DowntimeGDX.dim = 1;
+DowntimeGDX.val = Downtime;
 
-if isempty(gInitState)
-    gInitState = zeros(size(gens,2),1);
+if isempty(InitState)
+    InitState = zeros(size(gens,2),1);
 end
-gInitStateGDX.name = 'gInitState';
-gInitStateGDX.type = 'parameter';
-gInitStateGDX.uels = gens;
-gInitStateGDX.form = 'full';
-gInitStateGDX.dim = 2;
-gInitStateGDX.val = gInitState;
+InitStateGDX.name = 'gInitState';
+InitStateGDX.type = 'parameter';
+InitStateGDX.uels = gens;
+InitStateGDX.form = 'full';
+InitStateGDX.dim = 1;
+InitStateGDX.val = InitState;
 
-if isempty(gInitGen)
-    gInitGen = zeros(1,size(gens,2));
+if isempty(InitGen)
+    InitGen = zeros(1,size(gens,2));
 end
 
 % If the init gen is larger than max gen, due to offline gen issues, set
 % init gen equal to max gen
-for index = 1 : size(gInitGen, 2)
-    if gInitGen(1,index) > gCapacity(index,1)
-        gInitGen(1,index) = gCapacity(index,1);
+for index = 1 : size(InitGen, 2)
+    if InitGen(1,index) > Capacity(index,1)
+        InitGen(1,index) = Capacity(index,1);
     end
-    if gInitGen(1,index) > 0 && gInitGen(1,index) < gMin(index,1)
-        gInitGen(1,index) = gMin(index,1);
+    if InitGen(1,index) > 0 && InitGen(1,index) < genData.Min(index,1)*Capacity(index,1)
+        InitGen(1,index) = genData.Min(index,1)*Capacity(index,1);
     end
 end
 
-gInitGenGDX.name = 'gInitGen';
-gInitGenGDX.type = 'parameter';
-gInitGenGDX.uels = gens;
-gInitGenGDX.form = 'full';
-gInitGenGDX.dim = 2;
-gInitGenGDX.val = gInitGen;
+InitGenGDX.name = 'gInitGen'; 
+InitGenGDX.type = 'parameter';
+InitGenGDX.uels = gens;
+InitGenGDX.form = 'full';
+InitGenGDX.dim = 1;
+InitGenGDX.val = InitGen;
 
 % Write GDX file
-wgdx('GenData', gensGDX, gensTCR1GDX, gensTCR2GDX, gensTCR3GDX, gensTCR4GDX, gensTCR5GDX, gInitStateGDX, gInitGenGDX, gOntimeGDX, gDowntimeGDX, gCapacityGDX, gVCGDX, gRampRateGDX, gMinCapacityGDX, gMinUpGDX, gMinDownGDX, gStartupCostGDX, gNLCGDX);
-%% Load needed loadData to memory
+if settings.isEmissionsPrice == 1
+wgdx('GenData', gensGDX, gensTCR1GDX, gensTCR2GDX, gensTCR3GDX, gensTCR4GDX, gensTCR5GDX, InitStateGDX, InitGenGDX, OntimeGDX, DowntimeGDX, CapacityGDX, VCGDX, RampRateGDX, MinCapacityGDX, MinUpGDX, MinDownGDX, StartupCostGDX, NLCGDX, emissionRate); 
+else
+wgdx('GenData', gensGDX, gensTCR1GDX, gensTCR2GDX, gensTCR3GDX, gensTCR4GDX, gensTCR5GDX, InitStateGDX, InitGenGDX, OntimeGDX, DowntimeGDX, CapacityGDX, VCGDX, RampRateGDX, MinCapacityGDX, MinUpGDX, MinDownGDX, StartupCostGDX, NLCGDX); 
+end
 
-% load
-PSEG = loadData.PSEG(tStart:tEnd);
-PECO = loadData.PECO(tStart:tEnd);
-PPL = loadData.PPL(tStart:tEnd);
-BGE = loadData.BGE(tStart:tEnd);
-PEPCO = loadData.PEPCO(tStart:tEnd);
-RECO = loadData.RECO(tStart:tEnd);
-APS = loadData.APS(tStart:tEnd);
-COMED = loadData.COMED(tStart:tEnd);
-AEP = loadData.AEP(tStart:tEnd);
-DAY = loadData.DAY(tStart:tEnd);
-DUQ = loadData.DUQ(tStart:tEnd);
-DOM = loadData.DOM(tStart:tEnd);
-JCPL = loadData.JCPL(tStart:tEnd);
-METED = loadData.METED(tStart:tEnd);
-PENELEC = loadData.PENELEC(tStart:tEnd);
-AECO = loadData.AECO(tStart:tEnd);
-DPL = loadData.DPL(tStart:tEnd);
+%Load-serving utilities
+utilitiesTCR1 = ["AEP","AEPAPT","AEPIMP","AEPKPT","AEPOPT","AP","APS","COMED","CE","DAY","DEOK","DUQ","EKPC","OE","OVEC","PAPWR","PENELEC","PN"];
+utilitiesTCR2 = ["BC","BGE","PEPCO","SMECO"];
+utilitiesTCR3 = ["ME","METED","PLCO","PPL","UGI"];
+utilitiesTCR4 = ["AECO","DPL","DPLCO","EASTON","JC","JCPL","PE","PECO","PS","PSEG","RECO","VMEU"];
+utilitiesTCR5 = ["DOM"];
+utilities = cat(2,utilitiesTCR1,utilitiesTCR2,utilitiesTCR3,utilitiesTCR4,utilitiesTCR5);
+for n = 1:length(utilities); AddLoadUnit(loadData,'',utilities(n),tStart,tEnd); end
+
+
+TCRs = ["1","2","3","4","5"];
+if sum(sum(AEP))==0
+    AEP = AEPAPT + AEPIMP + AEPKPT + AEPOPT;
+end
+
+AEPAPT = 0; AEPIMP = 0; AEPKPT = 0; AEPOPT = 0;
 
 % Imports / exports
-ALTE = loadData.ALTE(tStart:tEnd);
-ALTW = loadData.ALTW(tStart:tEnd);
-AMIL = loadData.AMIL(tStart:tEnd);
-CIN = loadData.CIN(tStart:tEnd);
-CPLE = loadData.CPLE(tStart:tEnd);
-CPLW = loadData.CPLW(tStart:tEnd);
-CWLP = loadData.CWLP(tStart:tEnd);
-DUK = loadData.DUK(tStart:tEnd);
-EKPC = loadData.EKPC(tStart:tEnd);
-FE = loadData.FE(tStart:tEnd);
-IPL = loadData.IPL(tStart:tEnd);
-LGEE = loadData.LGEE(tStart:tEnd);
-LIND = loadData.LIND(tStart:tEnd);
-MEC = loadData.MEC(tStart:tEnd);
-MECS = loadData.MECS(tStart:tEnd);
-NEPT = loadData.NEPT(tStart:tEnd);
-NIPS = loadData.NIPS(tStart:tEnd);
-NYIS = loadData.NYIS(tStart:tEnd);
-OVEC = loadData.OVEC(tStart:tEnd);
-TVA = loadData.TVA(tStart:tEnd);
-WEC = loadData.WEC(tStart:tEnd);
+importsAEP = ["ALTE","ALTW","CPLW","CWLP","DUK","IPL","LAGN","LGEE","MEC","MECS","NIPS","OVEC","SIGE","TVA","WEC"];
+importsCOMED = ["AMIL","MDU"];
+importsDAY = ["CIN"];
+importsDOM = ["CPLE"];
+importsPENELEC = ["FE"];
+importsPSEG = ["HUDS","LIND","NEPT","NYIS"];
+importExportAreas = cat(2,importsAEP,importsCOMED,importsDAY,importsDOM,importsPENELEC,importsPSEG);
+for n = 1:length(importExportAreas); AddLoadUnit(loadData,'',importExportAreas(n),tStart,tEnd); end
 
-% Wind gen
-windMaxTCR1 = loadData.windMaxTCR1(tStart:tEnd);
-windMaxTCR2 = loadData.windMaxTCR2(tStart:tEnd);
-windMaxTCR3 = loadData.windMaxTCR3(tStart:tEnd);
-windMaxTCR4 = loadData.windMaxTCR4(tStart:tEnd);
-windMaxTCR5 = loadData.windMaxTCR5(tStart:tEnd);
+% Wind / solar
+TCRs = ["1","2","3","4","5"];
+for n = 1:length(TCRs); AddLoadUnit(PHORUMdata.renewablesData,'windTCR',TCRs(n),tStart,tEnd); end
+for n = 1:length(TCRs); AddLoadUnit(PHORUMdata.renewablesData,'solarTCR',TCRs(n),tStart,tEnd); end
 
-% Assign imports to zones
-AEP = AEP - (ALTE + ALTW + AMIL + CPLW + CWLP + DUK + EKPC + IPL + LGEE + MEC + MECS + NIPS + OVEC + TVA + WEC);
-PENELEC = PENELEC - FE;
-PSEG = PSEG - (NEPT + NYIS + LIND);
-DOM = DOM - CPLE;
-DAY = DAY - CIN;
- 
-% Assign zones to TCRs
-%loadTCR1 = AEP + APS + COMED + DAY + DUQ + PENELEC - windMaxTCR1;
-loadTCR1 = AEP + APS + COMED + DAY + DUQ + PENELEC;
-loadTCR2 = BGE + PEPCO;
-loadTCR3 = METED + PPL;
-%loadTCR4 = JCPL + PECO + PSEG + AECO + DPL + RECO - windMaxTCR3;
-loadTCR4 = JCPL + PECO + PSEG + AECO + DPL + RECO;
-loadTCR5 = DOM;
+% Assign imports to utility zones
+% for n = 1:length(importsAEP); AEP = AEP - eval(importsAEP(n)); end
+% for n = 1:length(importsCOMED); COMED = COMED - eval(importsCOMED(n)); end
+% for n = 1:length(importsDAY); DAY = DAY - eval(importsDAY(n)); end
+% for n = 1:length(importsDOM); DOM = DOM - eval(importsDOM(n)); end
+% for n = 1:length(importsPENELEC); PENELEC = PENELEC - eval(importsPENELEC(n)); end
+% for n = 1:length(importsPSEG); PSEG = PSEG - eval(importsPSEG(n)); end
 
+% Assign utility zones to TCRs
+loadTCR1 = zeros(settings.optWindow,1); loadTCR2 = loadTCR1; loadTCR3 = loadTCR1; loadTCR4 = loadTCR1; loadTCR5 = loadTCR1;
+for n = 1:length(utilitiesTCR1); loadTCR1 = loadTCR1 + eval(utilitiesTCR1(n)); end
+for n = 1:length(utilitiesTCR2); loadTCR2 = loadTCR2 + eval(utilitiesTCR2(n)); end
+for n = 1:length(utilitiesTCR3); loadTCR3 = loadTCR3 + eval(utilitiesTCR3(n)); end
+for n = 1:length(utilitiesTCR4); loadTCR4 = loadTCR4 + eval(utilitiesTCR4(n)); end
+for n = 1:length(utilitiesTCR5); loadTCR5 = loadTCR5 + eval(utilitiesTCR5(n)); end
+  
+% 
 % Allocate synchronized reserve.  Reserve requirements equal to largest 
 % single generator in TCR1, TCRs2-4,and TCR5
-loadTCR1 = loadTCR1 + 1300;
-loadTCR2 = loadTCR2 + 1170*loadTCR2./(loadTCR2 + loadTCR3 + loadTCR4);
-loadTCR3 = loadTCR3 + 1170*loadTCR3./(loadTCR2 + loadTCR3 + loadTCR4);
-loadTCR4 = loadTCR4 + 1170*loadTCR4./(loadTCR2 + loadTCR3 + loadTCR4);
-loadTCR5 = loadTCR5 + 1170;
+loadTCR1 = loadTCR1 + max(genData(genData.TCR==1,:).gen_capacity_needs);
+loadTCR2 = loadTCR2 + max(genData(genData.TCR==2 | genData.TCR==3 | genData.TCR==4,:).gen_capacity_needs)*loadTCR2./(loadTCR2 + loadTCR3 + loadTCR4);
+loadTCR3 = loadTCR3 + max(genData(genData.TCR==2 | genData.TCR==3 | genData.TCR==4,:).gen_capacity_needs)*loadTCR3./(loadTCR2 + loadTCR3 + loadTCR4);
+loadTCR4 = loadTCR4 + max(genData(genData.TCR==2 | genData.TCR==3 | genData.TCR==4,:).gen_capacity_needs)*loadTCR4./(loadTCR2 + loadTCR3 + loadTCR4);
+loadTCR5 = loadTCR5 + max(genData(genData.TCR==5,:).gen_capacity_needs);
 
-% TEMP set loadTCR1 to 1
-%loadTCR1 = loadTCR1*0+1000;
-totalLoad = [totalLoad;loadTCR1(1:24)+loadTCR2(1:24)+loadTCR3(1:24)+loadTCR4(1:24)+loadTCR5(1:24)];
-
-% Transmission constraints
-EImax = loadData.EImax(tStart:tEnd);
-CImax = loadData.CImax(tStart:tEnd);
-WImax = loadData.WImax(tStart:tEnd);
-DOMImax = loadData.DOMImax(tStart:tEnd);
-
-% Actual LMPs
- LMPTCR1actual = loadData.LMPTCR1actual(tStart:tEnd);
- LMPTCR2actual = loadData.LMPTCR2actual(tStart:tEnd);
- LMPTCR3actual = loadData.LMPTCR3actual(tStart:tEnd);
- LMPTCR4actual = loadData.LMPTCR4actual(tStart:tEnd);
- LMPTCR5actual = loadData.LMPTCR5actual(tStart:tEnd);
 
 % Setup for initial run - 
 % Add time period 0, which is hour 24 from the previous optimization.
@@ -446,16 +361,33 @@ loadTCR2 = [loadTCR2(1); loadTCR2];
 loadTCR3 = [loadTCR3(1); loadTCR3];
 loadTCR4 = [loadTCR4(1); loadTCR4];
 loadTCR5 = [loadTCR5(1); loadTCR5];
-DOMImax = [DOMImax(1); DOMImax];
-WImax = [WImax(1); WImax];
-CImax = [CImax(1); CImax];
-EImax = [EImax(1); EImax];
-windMaxTCR1 = [windMaxTCR1(1); windMaxTCR1];
-windMaxTCR2 = [windMaxTCR2(1); windMaxTCR2];
-windMaxTCR3 = [windMaxTCR3(1); windMaxTCR3];
-windMaxTCR4 = [windMaxTCR4(1); windMaxTCR4];
-windMaxTCR5 = [windMaxTCR5(1); windMaxTCR5];
+windTCR1 = [windTCR1(1); windTCR1];
+windTCR2 = [windTCR2(1); windTCR2];
+windTCR3 = [windTCR3(1); windTCR3];
+windTCR4 = [windTCR4(1); windTCR4];
+windTCR5 = [windTCR5(1); windTCR5];
+solarTCR1 = [solarTCR1(1); solarTCR1];
+solarTCR2 = [solarTCR2(2); solarTCR2];
+solarTCR3 = [solarTCR3(3); solarTCR3];
+solarTCR4 = [solarTCR4(4); solarTCR4];
+solarTCR5 = [solarTCR5(1); solarTCR5];
 
+% Transmission constraints
+if settings.isTransmissionConstraints == 1
+	TI12 = PHORUMdata.transferLimitData.TI12(tStart:tEnd);
+	TI13 = PHORUMdata.transferLimitData.TI13(tStart:tEnd);
+	TI15 = PHORUMdata.transferLimitData.TI15(tStart:tEnd);
+	TI23 = PHORUMdata.transferLimitData.TI23(tStart:tEnd);
+	TI25 = PHORUMdata.transferLimitData.TI25(tStart:tEnd);
+	TI34 = PHORUMdata.transferLimitData.TI34(tStart:tEnd);
+	
+	TI12 = [TI12(1); TI12];
+	TI13 = [TI13(1); TI13];
+	TI15 = [TI15(1); TI15];
+	TI23 = [TI23(1); TI23];
+	TI25 = [TI25(1); TI25];
+	TI34 = [TI34(1); TI34];
+end
 %% Create load GDX files
 
 % Create GDX structures
@@ -466,6 +398,15 @@ end
 time.name = 't';
 time.type = 'set';
 time.uels = timeVars;
+
+
+if settings.isEmissionsPrice == 1
+	loadObjective.name = 'objective';
+	loadObjective.val = objective;
+	loadObjective.type = 'parameter';
+	loadObjective.form = 'full';
+	loadObjective.dim = 0;
+end
 
 loadTCR1GDX.name = 'loadTCR1';
 loadTCR1GDX.val = loadTCR1;
@@ -502,147 +443,106 @@ loadTCR5GDX.uels = timeVars;
 loadTCR5GDX.form = 'full';
 loadTCR5GDX.dim = 1;
 
-TI12maxGDX.name = 'TI12max';
-TI12maxGDX.val = WImax/4;
-TI12maxGDX.type = 'parameter';
-TI12maxGDX.uels = timeVars;
-TI12maxGDX.form = 'full';
-TI12maxGDX.dim = 1;
+if settings.isTransmissionConstraints == 1
+	TI12maxGDX.name = 'TI12max';
+	TI12maxGDX.val = TI12;
+	TI12maxGDX.type = 'parameter';
+	TI12maxGDX.uels = timeVars;
+	TI12maxGDX.form = 'full';
+	TI12maxGDX.dim = 1;
+	 
+	TI13maxGDX.name = 'TI13max';
+	TI13maxGDX.val = TI13;
+	TI13maxGDX.type = 'parameter';
+	TI13maxGDX.uels = timeVars;
+	TI13maxGDX.form = 'full';
+	TI13maxGDX.dim = 1;
+	 
+	TI15maxGDX.name = 'TI15max';
+	TI15maxGDX.val = TI15;
+	TI15maxGDX.type = 'parameter';
+	TI15maxGDX.uels = timeVars;
+	TI15maxGDX.form = 'full';
+	TI15maxGDX.dim = 1;
+	 
+	TI52maxGDX.name = 'TI52max';
+	TI52maxGDX.val = TI25;
+	TI52maxGDX.type = 'parameter';
+	TI52maxGDX.uels = timeVars;
+	TI52maxGDX.form = 'full';
+	TI52maxGDX.dim = 1;
+	 
+	TI23maxGDX.name = 'TI23max';
+	TI23maxGDX.val = TI23;
+	TI23maxGDX.type = 'parameter';
+	TI23maxGDX.uels = timeVars;
+	TI23maxGDX.form = 'full';
+	TI23maxGDX.dim = 1;
+	 
+	TI34maxGDX.name = 'TI34max';
+	TI34maxGDX.val = TI34;
+	TI34maxGDX.type = 'parameter';
+	TI34maxGDX.uels = timeVars;
+	TI34maxGDX.form = 'full';
+	TI34maxGDX.dim = 1;
+end
 
-TI13maxGDX.name = 'TI13max';
-TI13maxGDX.val = WImax/2;
-TI13maxGDX.type = 'parameter';
-TI13maxGDX.uels = timeVars;
-TI13maxGDX.form = 'full';
-TI13maxGDX.dim = 1;
-
-TI15maxGDX.name = 'TI15max';
-TI15maxGDX.val = DOMImax;
-TI15maxGDX.type = 'parameter';
-TI15maxGDX.uels = timeVars;
-TI15maxGDX.form = 'full';
-TI15maxGDX.dim = 1;
-
-TI52maxGDX.name = 'TI52max';
-TI52maxGDX.val = WImax/4;
-TI52maxGDX.type = 'parameter';
-TI52maxGDX.uels = timeVars;
-TI52maxGDX.form = 'full';
-TI52maxGDX.dim = 1;
-
-TI23maxGDX.name = 'TI23max';
-TI23maxGDX.val = CImax;
-TI23maxGDX.type = 'parameter';
-TI23maxGDX.uels = timeVars;
-TI23maxGDX.form = 'full';
-TI23maxGDX.dim = 1;
-
-TI34maxGDX.name = 'TI34max';
-TI34maxGDX.val = EImax;
-TI34maxGDX.type = 'parameter';
-TI34maxGDX.uels = timeVars;
-TI34maxGDX.form = 'full';
-TI34maxGDX.dim = 1;
-
-LMPTCR1actualGDX.name = 'LMPTCR1actual';
-LMPTCR1actualGDX.val = LMPTCR1actual;
-LMPTCR1actualGDX.type = 'parameter';
-LMPTCR1actualGDX.uels = timeVars;
-LMPTCR1actualGDX.form = 'full';
-LMPTCR1actualGDX.dim = 1;
-
-LMPTCR2actualGDX.name = 'LMPTCR2actual';
-LMPTCR2actualGDX.val = LMPTCR2actual;
-LMPTCR2actualGDX.type = 'parameter';
-LMPTCR2actualGDX.uels = timeVars;
-LMPTCR2actualGDX.form = 'full';
-LMPTCR2actualGDX.dim = 1;
-
-LMPTCR3actualGDX.name = 'LMPTCR3actual';
-LMPTCR3actualGDX.val = LMPTCR3actual;
-LMPTCR3actualGDX.type = 'parameter';
-LMPTCR3actualGDX.uels = timeVars;
-LMPTCR3actualGDX.form = 'full';
-LMPTCR3actualGDX.dim = 1;
-
-LMPTCR4actualGDX.name = 'LMPTCR4actual';
-LMPTCR4actualGDX.val = LMPTCR4actual;
-LMPTCR4actualGDX.type = 'parameter';
-LMPTCR4actualGDX.uels = timeVars;
-LMPTCR4actualGDX.form = 'full';
-LMPTCR4actualGDX.dim = 1;
-
-LMPTCR5actualGDX.name = 'LMPTCR5actual';
-LMPTCR5actualGDX.val = LMPTCR5actual;
-LMPTCR5actualGDX.type = 'parameter';
-LMPTCR5actualGDX.uels = timeVars;
-LMPTCR5actualGDX.form = 'full';
-LMPTCR5actualGDX.dim = 1;
-
-windMaxTCR1GDX.name = 'windMaxTCR1';
-windMaxTCR1GDX.val = windMaxTCR1;
-windMaxTCR1GDX.type = 'parameter';
-windMaxTCR1GDX.uels = timeVars;
-windMaxTCR1GDX.form = 'full';
-windMaxTCR1GDX.dim = 1;
-
-windMaxTCR2GDX.name = 'windMaxTCR2';
-windMaxTCR2GDX.val = windMaxTCR2;
-windMaxTCR2GDX.type = 'parameter';
-windMaxTCR2GDX.uels = timeVars;
-windMaxTCR2GDX.form = 'full';
-windMaxTCR2GDX.dim = 1;
-
-windMaxTCR3GDX.name = 'windMaxTCR3';
-windMaxTCR3GDX.val = windMaxTCR3;
-windMaxTCR3GDX.type = 'parameter';
-windMaxTCR3GDX.uels = timeVars;
-windMaxTCR3GDX.form = 'full';
-windMaxTCR3GDX.dim = 1;
-
-windMaxTCR4GDX.name = 'windMaxTCR4';
-windMaxTCR4GDX.val = windMaxTCR4;
-windMaxTCR4GDX.type = 'parameter';
-windMaxTCR4GDX.uels = timeVars;
-windMaxTCR4GDX.form = 'full';
-windMaxTCR4GDX.dim = 1;
-
-windMaxTCR5GDX.name = 'windMaxTCR5';
-windMaxTCR5GDX.val = windMaxTCR5;
-windMaxTCR5GDX.type = 'parameter';
-windMaxTCR5GDX.uels = timeVars;
-windMaxTCR5GDX.form = 'full';
-windMaxTCR5GDX.dim = 1;
+windSolarTCR1GDX.name = 'windSolarTCR1';
+windSolarTCR1GDX.val = windTCR1 + solarTCR1;
+windSolarTCR1GDX.type = 'parameter';
+windSolarTCR1GDX.uels = timeVars;
+windSolarTCR1GDX.form = 'full';
+windSolarTCR1GDX.dim = 1;
+ 
+windSolarTCR2GDX.name = 'windSolarTCR2';
+windSolarTCR2GDX.val = windTCR2 + solarTCR2;
+windSolarTCR2GDX.type = 'parameter';
+windSolarTCR2GDX.uels = timeVars;
+windSolarTCR2GDX.form = 'full';
+windSolarTCR2GDX.dim = 1;
+ 
+windSolarTCR3GDX.name = 'windSolarTCR3';
+windSolarTCR3GDX.val = windTCR3 + solarTCR3;
+windSolarTCR3GDX.type = 'parameter';
+windSolarTCR3GDX.uels = timeVars;
+windSolarTCR3GDX.form = 'full';
+windSolarTCR3GDX.dim = 1;
+ 
+windSolarTCR4GDX.name = 'windSolarTCR4';
+windSolarTCR4GDX.val = windTCR4 + solarTCR4;
+windSolarTCR4GDX.type = 'parameter';
+windSolarTCR4GDX.uels = timeVars;
+windSolarTCR4GDX.form = 'full';
+windSolarTCR4GDX.dim = 1;
+ 
+windSolarTCR5GDX.name = 'windSolarTCR5';
+windSolarTCR5GDX.val = windTCR5 + solarTCR5;
+windSolarTCR5GDX.type = 'parameter';
+windSolarTCR5GDX.uels = timeVars;
+windSolarTCR5GDX.form = 'full';
+windSolarTCR5GDX.dim = 1;
 
 % Create load GDX file
-wgdx('LoadData', time, loadTCR1GDX, loadTCR2GDX, loadTCR3GDX, loadTCR4GDX, loadTCR5GDX, TI12maxGDX, TI13maxGDX, TI15maxGDX, TI52maxGDX, TI23maxGDX, TI34maxGDX, LMPTCR1actualGDX, LMPTCR2actualGDX, LMPTCR3actualGDX, LMPTCR4actualGDX, LMPTCR5actualGDX, windMaxTCR1GDX, windMaxTCR2GDX, windMaxTCR3GDX, windMaxTCR4GDX, windMaxTCR5GDX);
-
-% This function loads storage data into GAMS.
-
-%% Load needed storageData to memory
-
-sTCR = storageData.sTCR;
-sCapacity = storageData.sCapacity;
-sChargeEff = storageData.sChargeEff;
-sDischargeEff = storageData.sDischargeEff;
-sDuration = storageData.sDuration;
-sVC = storageData.sVC;
+if settings.isTransmissionConstraints
+    wgdx('LoadData', time, loadTCR1GDX, loadTCR2GDX, loadTCR3GDX, loadTCR4GDX, loadTCR5GDX, windSolarTCR1GDX, windSolarTCR2GDX, windSolarTCR3GDX, windSolarTCR4GDX, windSolarTCR5GDX, TI12maxGDX, TI13maxGDX, TI15maxGDX, TI52maxGDX, TI23maxGDX, TI34maxGDX); %loadObjective;
+else
+    wgdx('LoadData', time, loadTCR1GDX, loadTCR2GDX, loadTCR3GDX, loadTCR4GDX, loadTCR5GDX, windSolarTCR1GDX, windSolarTCR2GDX, windSolarTCR3GDX, windSolarTCR4GDX, windSolarTCR5GDX);
+end
 
 % Set initial SOC.  If this is the first day, set equal to 1/2 capacity.
 % If this is not the first day, use results from the previous day.
 if isempty(prevDayResults.sInitSOC)
-    sInitSOC = sCapacity.*sDuration/2;
+    sInitSOC = storageData.EnergyCapacity/2;
 else
     sInitSOC = prevDayResults.sInitSOC;
 end
 
 % Set the max SOC (capacity in MWh)
-sSOCmax = sCapacity.*sDuration;
+sSOCmax = storageData.EnergyCapacity;
 
 % Set up GAMS subsets of generators for each TCR.  If a TCR does not
 % contain any storage, direct it to the 'blank' entry in the storage
 % database.
-
 stors = [];
 storsTCR1 = [];
 storsTCR2 = [];
@@ -654,21 +554,21 @@ countTCR2 = 1;
 countTCR3 = 1;
 countTCR4 = 1;
 countTCR5 = 1;
-for s = 1 : size(sTCR,1)
+for s = 1 : size(storageData.TCR,1)
     stors{s} = strcat('s',num2str(s));
-    if sTCR(s) == 1 
+    if storageData.TCR(s) == 1 
         storsTCR1{countTCR1} = strcat('s',num2str(s));
         countTCR1 = countTCR1+1;
-    elseif sTCR(s) == 2 
+    elseif storageData.TCR(s) == 2 
         storsTCR2{countTCR2} = strcat('s',num2str(s));
         countTCR2 = countTCR2+1;
-    elseif sTCR(s) == 3 
+    elseif storageData.TCR(s) == 3 
         storsTCR3{countTCR3} = strcat('s',num2str(s));
         countTCR3 = countTCR3+1;
-    elseif sTCR(s) == 4 
+    elseif storageData.TCR(s) == 4 
         storsTCR4{countTCR4} = strcat('s',num2str(s));
         countTCR4 = countTCR4+1;
-    elseif sTCR(s) == 5 
+    elseif storageData.TCR(s) == 5 
         storsTCR5{countTCR5} = strcat('s',num2str(s));
         countTCR5 = countTCR5+1;
     end
@@ -716,63 +616,53 @@ end
 
 sRampRateGDX.name = 'sRampRate';
 sRampRateGDX.type = 'parameter';
-sRampRateGDX.val = sCapacity;
+sRampRateGDX.val = storageData.PowerCapacity;
 sRampRateGDX.uels = stors;
 sRampRateGDX.form = 'full';
-sRampRateGDX.dim = 2;
+sRampRateGDX.dim = 1;
 
 sSOCmaxGDX.name = 'sSOCmax';
 sSOCmaxGDX.type = 'parameter';
 sSOCmaxGDX.val = sSOCmax;
 sSOCmaxGDX.uels = stors;
 sSOCmaxGDX.form = 'full';
-sSOCmaxGDX.dim = 2;
+sSOCmaxGDX.dim = 1;
 
 sChargeEffGDX.name = 'sChargeEff';
 sChargeEffGDX.type = 'parameter';
-sChargeEffGDX.val = sChargeEff;
+sChargeEffGDX.val = storageData.ChargeEfficiency;
 sChargeEffGDX.uels = stors;
 sChargeEffGDX.form = 'full';
-sChargeEffGDX.dim = 2;
+sChargeEffGDX.dim = 1;
 
 sDischargeEffGDX.name = 'sDischargeEff';
 sDischargeEffGDX.type = 'parameter';
-sDischargeEffGDX.val = sDischargeEff;
+sDischargeEffGDX.val = storageData.DischargeEfficiency;
 sDischargeEffGDX.uels = stors;
 sDischargeEffGDX.form = 'full';
-sDischargeEffGDX.dim = 2;
+sDischargeEffGDX.dim = 1;
 
 sVCGDX.name = 'sMargCost';
 sVCGDX.type = 'parameter';
-sVCGDX.val = sVC;
+sVCGDX.val = storageData.VariableCost;
 sVCGDX.uels = stors;
 sVCGDX.form = 'full';
-sVCGDX.dim = 2;
+sVCGDX.dim = 1;
 
 sInitSOCGDX.name = 'sInitSOC';
 sInitSOCGDX.type = 'parameter';
 sInitSOCGDX.val = sInitSOC;
 sInitSOCGDX.uels = stors;
 sInitSOCGDX.form = 'full';
-sInitSOCGDX.dim = 2;
+sInitSOCGDX.dim = 1;
 
 wgdx('StorageData', storsGDX, storsTCR1GDX, storsTCR2GDX, storsTCR3GDX, storsTCR4GDX, storsTCR5GDX, sRampRateGDX, sSOCmaxGDX, sChargeEffGDX, sDischargeEffGDX, sVCGDX, sInitSOCGDX);
 
-
-if settings.isEVanalysis == 1
-    % new code
-    vehTCR1 = [];
-    vehTCR2 = [];
-    vehTCR3 = [];
-    vehTCR4 = [];
-    vehTCR5 = [];
-    
-    load('EVdata')
-
+if settings.isControlledCharging
     % Set initial SOC.  If this is the first day, set equal to 1/2 capacity.
     % If this is not the first day, use results from the previous day.
     if isempty(prevDayResults.vInitSOC)
-        vInitSOC = EVdata.prevSOC;
+        vInitSOC = EVdata.initialSOC.*EVdata.number*0.001;
     else
         vInitSOC = prevDayResults.vInitSOC;
     end
@@ -793,7 +683,7 @@ if settings.isEVanalysis == 1
 
     vMilesGDX.name = 'vMiles';
     vMilesGDX.type = 'parameter';
-    vMilesGDX.val = EVdata.miles(tStart:tEnd,:);
+    vMilesGDX.val = [EVdata.miles_battery(24,:);EVdata.miles_battery(tStart:tEnd,:)];
     vMilesGDX.uels = {timeVars,vehProfiles}; 
     vMilesGDX.form = 'full';
     vMilesGDX.dim = 2;
@@ -824,22 +714,23 @@ if settings.isEVanalysis == 1
     vBatteryGDX.val = EVdata.vBattery;
     vBatteryGDX.uels = vehProfiles;
     vBatteryGDX.form = 'full';
-    vBatteryGDX.dim = 2;
+    vBatteryGDX.dim = 1;
 
     vCRGDX.name = 'vCR';
     vCRGDX.type = 'parameter';
     vCRGDX.val = EVdata.vCR;
     vCRGDX.uels = vehProfiles;
     vCRGDX.form = 'full';
-    vCRGDX.dim = 2;
+    vCRGDX.dim = 1;
 
     vEffGDX.name = 'vEff';
     vEffGDX.type = 'parameter';
     vEffGDX.val = EVdata.vEff;
     vEffGDX.uels = vehProfiles;
     vEffGDX.form = 'full';
-    vEffGDX.dim = 2;
+    vEffGDX.dim = 1;
 
     wgdx('VehData',vehiclesGDX, areasGDX,vMilesGDX,vAvailableGDX,vNumGDX,vInitSOCGDX,vBatteryGDX,vCRGDX,vEffGDX)
 end
+movefile('*.gdx',strcat('Cases\',dirString))
 end

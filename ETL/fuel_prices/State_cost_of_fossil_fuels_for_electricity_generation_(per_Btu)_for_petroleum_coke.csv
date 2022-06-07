@@ -1,0 +1,52 @@
+state,source key,Jan-19,Feb-19,Mar-19,Apr-19,May-19,Jun-19,Jul-19,Aug-19,Sep-19,Oct-19,Nov-19,Dec-19
+Connecticut,ELEC.COST_BTU.PC-CT-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Maine,ELEC.COST_BTU.PC-ME-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Massachusetts,ELEC.COST_BTU.PC-MA-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+New Hampshire,ELEC.COST_BTU.PC-NH-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Rhode Island,ELEC.COST_BTU.PC-RI-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Vermont,ELEC.COST_BTU.PC-VT-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+New Jersey,ELEC.COST_BTU.PC-NJ-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+New York,ELEC.COST_BTU.PC-NY-98.M,0,0,0,0,0,0,0,0,0,0,0,0
+Pennsylvania,ELEC.COST_BTU.PC-PA-98.M,0,0,0,0,0,0,0,0,0,0,0,0
+Illinois,ELEC.COST_BTU.PC-IL-98.M,0,0,0,0,0,0,0,0,0,0,0,0
+Indiana,ELEC.COST_BTU.PC-IN-98.M,0,0,0,0,0,0,0,0,0,0,0,0
+Michigan,ELEC.COST_BTU.PC-MI-98.M,1.57,0,0,0,1.53,1.52,1.53,1.53,1.53,1.54,1.54,1.54
+Ohio,ELEC.COST_BTU.PC-OH-98.M,0,0,0,0,0,0,0,0,0,0,0,0
+Wisconsin,ELEC.COST_BTU.PC-WI-98.M,1.91,1.85,1.89,1.89,1.83,1.94,1.82,1.83,1.86,1.81,1.83,1.89
+Iowa,ELEC.COST_BTU.PC-IA-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Kansas,ELEC.COST_BTU.PC-KS-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Minnesota,ELEC.COST_BTU.PC-MN-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Missouri,ELEC.COST_BTU.PC-MO-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Nebraska,ELEC.COST_BTU.PC-NE-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+North Dakota,ELEC.COST_BTU.PC-ND-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+South Dakota,ELEC.COST_BTU.PC-SD-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Delaware,ELEC.COST_BTU.PC-DE-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+District Of Columbia,ELEC.COST_BTU.PC-DC-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Florida,ELEC.COST_BTU.PC-FL-98.M,2.58,2.62,2.86,2.84,2.87,2.76,2.71,2.42,2.36,2.31,1.89,0
+Georgia,ELEC.COST_BTU.PC-GA-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Maryland,ELEC.COST_BTU.PC-MD-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+North Carolina,ELEC.COST_BTU.PC-NC-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+South Carolina,ELEC.COST_BTU.PC-SC-98.M,0,0,0,0,0,0,0,0,0,0,0,0
+Virginia,ELEC.COST_BTU.PC-VA-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+West Virginia,ELEC.COST_BTU.PC-WV-98.M,0,0,0,0,0,0,0,0,0,0,0,0
+Alabama,ELEC.COST_BTU.PC-AL-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Kentucky,ELEC.COST_BTU.PC-KY-98.M,0,0,0,0,0,0,0,0,0,0,0,0
+Mississippi,ELEC.COST_BTU.PC-MS-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Tennessee,ELEC.COST_BTU.PC-TN-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Arkansas,ELEC.COST_BTU.PC-AR-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Louisiana,ELEC.COST_BTU.PC-LA-98.M,2.05,2.17,2.27,2.7,2.36,2.16,1.97,1.6,1.26,1.15,1.21,1.02
+Oklahoma,ELEC.COST_BTU.PC-OK-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Texas,ELEC.COST_BTU.PC-TX-98.M,0,0,0,0,0,0,0,0,0,0,0,0
+Arizona,ELEC.COST_BTU.PC-AZ-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Colorado,ELEC.COST_BTU.PC-CO-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Idaho,ELEC.COST_BTU.PC-ID-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Montana,ELEC.COST_BTU.PC-MT-98.M,0,0,0,0,0,0,0,0,0,0,0,0
+Nevada,ELEC.COST_BTU.PC-NV-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+New Mexico,ELEC.COST_BTU.PC-NM-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Utah,ELEC.COST_BTU.PC-UT-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Wyoming,ELEC.COST_BTU.PC-WY-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+California,ELEC.COST_BTU.PC-CA-98.M,0,0,0,0,0,0,0,0,0,0,0,0
+Oregon,ELEC.COST_BTU.PC-OR-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Washington,ELEC.COST_BTU.PC-WA-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Alaska,ELEC.COST_BTU.PC-AK-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Hawaii,ELEC.COST_BTU.PC-HI-98.M,--,--,--,--,--,--,--,--,--,--,--,--

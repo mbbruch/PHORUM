@@ -1,0 +1,11 @@
+census_region,source key,Jan-19,Feb-19,Mar-19,Apr-19,May-19,Jun-19,Jul-19,Aug-19,Sep-19,Oct-19,Nov-19,Dec-19
+New England,ELEC.COST_BTU.PC-NEW-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+Middle Atlantic,ELEC.COST_BTU.PC-MAT-98.M,0,0,0,0,0,0,0,0,0,0,0,0
+East North Central,ELEC.COST_BTU.PC-ENC-98.M,1.62,1.85,1.89,1.89,1.54,1.55,1.55,1.56,1.6,1.61,1.61,1.58
+West North Central,ELEC.COST_BTU.PC-WNC-98.M,--,--,--,--,--,--,--,--,--,--,--,--
+South Atlantic,ELEC.COST_BTU.PC-SAT-98.M,2.58,2.62,2.86,2.84,2.87,2.76,2.71,2.42,2.36,2.31,1.89,0
+East South Central,ELEC.COST_BTU.PC-ESC-98.M,0,0,0,0,0,0,0,0,0,0,0,0
+West South Central,ELEC.COST_BTU.PC-WSC-98.M,2.05,2.17,2.27,2.7,2.36,2.16,1.97,1.6,1.26,1.15,1.21,1.02
+Mountain,ELEC.COST_BTU.PC-MTN-98.M,0,0,0,0,0,0,0,0,0,0,0,0
+Pacific Contiguous,ELEC.COST_BTU.PC-PCC-98.M,0,0,0,0,0,0,0,0,0,0,0,0
+Pacific Noncontiguous,ELEC.COST_BTU.PC-PCN-98.M,--,--,--,--,--,--,--,--,--,--,--,--

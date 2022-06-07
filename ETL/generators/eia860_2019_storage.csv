@@ -1,0 +1,173 @@
+﻿Utility ID,Utility Name,Plant Code,Plant Name,State,County,Generator ID,Status,Technology,Prime Mover,Sector Name,Sector,Nameplate Capacity (MW),Summer Capacity (MW),Winter Capacity (MW),Operating Month,Operating Year,Nameplate Energy Capacity (MWh),Maximum Charge Rate (MW),Maximum Discharge Rate (MW),Storage Technology 1,Storage Technology 2,Storage Technology 3,Storage Technology 4,Nameplate Reactive Power Rating,Storage Enclosure Type,Arbitrage,Frequency Regulation,Load Following,Ramping / Spinning Reserve,Co-Located Renewable Firming,Transmission and Distribution Deferral,System Peak Shaving,Load Management,Voltage or Reactive Power Support,Backup Power,Excess Wind and Solar Generation
+9216,Imperial Irrigation District,389,El Centro Hybrid,CA,Imperial,BESS,OP,Batteries,BA,Electric Utility,1,30.0,28.0,29.0,10,2016,20.0,30.0,30.0,LIB,,,,14.4,BL,N,Y,Y,Y,N,,,,Y,,N
+11843,Maui Electric Co Ltd,792,Palaau Power Hybrid,HI,Maui,BAT1,OP,Batteries,BA,Electric Utility,1,2.0,2.0,2.0,5,2017,2.0,0.5,0.5,OTH,,,,2.0,CS,,Y,,,,,,,,,
+9273,Indianapolis Power & Light Co,990,Harding Street,IN,Marion,BAT1,OP,Batteries,BA,Electric Utility,1,20.0,20.0,20.0,6,2016,20.0,20.0,20.0,LIB,,,,20.0,BL,,Y,,,,,,,,,
+31719,FPL Energy Wyman LLC,1507,William F Wyman Hybrid,ME,Cumberland,BESS,OP,Batteries,BA,IPP Non-CHP,2,16.7,16.2,16.2,12,2016,10.9,16.7,16.2,LIB,,,,10.2,CS,,Y,,,,,,,,,
+13206,Nantucket Electric Co,1615,Nantucket Hybrid,MA,Nantucket,20,OP,Batteries,BA,Electric Utility,1,6.0,6.0,6.0,7,2019,48.0,6.0,6.0,LIB,,,,7.0,BL,,,,,,Y,,,,Y,
+3542,Duke Energy Ohio Inc,2830,Walter C Beckjord,OH,Clermont,BECK1,OP,Batteries,BA,Electric Utility,1,2.0,2.0,2.0,1,2015,1.0,2.0,2.0,OTH,,,,2.0,CS,,Y,,,,,,,,,
+3542,Duke Energy Ohio Inc,2830,Walter C Beckjord,OH,Clermont,BECK2,OP,Batteries,BA,Electric Utility,1,2.0,2.0,2.0,11,2015,0.8,2.0,2.0,OTH,,,,2.0,CS,,Y,,,,,,,,,
+10451,Kotzebue Electric Assn Inc,6304,Kotzebue Hybrid,AK,NORTHWEST ARCTIC,ES1,OP,Batteries,BA,Electric Utility,1,1.2,1.2,1.2,12,2015,1.0,1.2,1.2,LIB,,,,1.2,CT,,Y,Y,Y,Y,,Y,Y,,Y,Y
+13683,North Carolina El Member Corp,6377,Ocracoke Hybrid,NC,Hyde,BAT,OP,Batteries,BA,Electric Utility,1,1.0,1.0,1.0,1,2017,1.0,0.5,0.5,LIB,,,,0.0,CS,Y,,,,,,,Y,,,
+17609,Southern California Edison Co,6704,Pebbly Beach Generating Station Hybrid,CA,Los Angeles,NASB1,OP,Batteries,BA,Electric Utility,1,1.0,1.0,1.0,8,2012,6.8,1.0,1.0,NAB,,,,0.8,CS,,,,Y,,,Y,Y,Y,,
+189,PowerSouth Energy Cooperative,7063,McIntosh (AL),AL,Washington,1,OP,Natural Gas with Compressed Air Storage,CE,Electric Utility,1,110.0,110.0,110.0,6,1991,110.0,52.0,110.0,,,,,0.9,BL,,,Y,,,,Y,Y,Y,,
+54736,"VESI Pomona Energy Storage, Inc.",50300,VESI Pomona,CA,Los Angeles,BESS1,OP,Batteries,BA,IPP Non-CHP,2,20.0,20.0,20.0,12,2016,20.0,20.0,20.0,LIB,,,,20.0,BL,,Y,Y,,,,N,N,N,N,
+1752,Biola University,54296,Biola University Hybrid,CA,Los Angeles,BATT,OP,Batteries,BA,Commercial CHP,5,0.3,0.3,0.3,2,2018,0.5,0.3,0.3,LIB,,,,0.3,CS,,,,,,,Y,N,,,
+6862,"Green Mountain Storage, LLC",55370,"Green Mountain Storage, LLC",PA,Somerset,BGM,OP,Batteries,BA,IPP Non-CHP,2,10.4,10.4,10.4,5,2016,10.4,10.4,10.4,LIB,,,,10.4,CT,,Y,,,,,,,,,
+17609,Southern California Edison Co,56472,Grapeland Hybrid,CA,San Bernardino,BA1,OP,Batteries,BA,Electric Utility,1,10.0,10.0,10.0,12,2016,10.0,10.0,10.0,LIB,,,,6.0,BL,N,Y,N,Y,N,N,N,N,N,N,N
+17609,Southern California Edison Co,56475,Center Hybrid,CA,LOS ANGELES,BA1,OP,Batteries,BA,Electric Utility,1,10.0,10.0,10.0,12,2016,10.0,10.0,10.0,LIB,,,,6.0,BL,N,Y,N,Y,N,N,N,N,N,N,N
+56023,Arizona Solar One LLC,56812,Solana Generating Station,AZ,Maricopa,GEN 1,OP,Solar Thermal with Energy Storage,CP,IPP Non-CHP,2,140.0,147.8,147.8,10,2013, , , ,,,,, ,,,,,,,,,Y,,,Y
+56023,Arizona Solar One LLC,56812,Solana Generating Station,AZ,Maricopa,GEN2,OP,Solar Thermal with Energy Storage,CP,IPP Non-CHP,2,140.0,147.8,147.8,10,2013, , , ,,,,, ,,,,,,,,,Y,,,Y
+56272,Duke Energy DEGS Notrees,56961,Notrees Windpower Hybrid,TX,Ector,BATT,OP,Batteries,BA,IPP Non-CHP,2,36.0,36.0,36.0,12,2012,13.6,36.0,36.0,LIB,,,,36.0,BL,N,Y,N,N,N,N,N,N,N,N,N
+56215,RWE Renewables Americas LLC,56981,Pyron Wind Farm LLC Hybrid,TX,Fisher,PYRBT,OP,Batteries,BA,IPP Non-CHP,2,9.9,9.9,9.9,1,2018,9.9,9.9,9.9,LIB,,,,3.3,CS,,Y,,,,,,,,,
+56215,RWE Renewables Americas LLC,56984,Inadale Wind Farm LLC Hybrid,TX,Nolan,INABT,OP,Batteries,BA,IPP Non-CHP,2,9.9,9.9,9.9,1,2018,9.9,9.9,9.9,LIB,,,,3.3,CS,,Y,,,,,,,,,
+55963,AE Power Services LLC,57045,Rolling Thunder Wind Farm Hybrid,SD,Hand,2,OP,Batteries,BA,IPP Non-CHP,2,0.8,0.8,0.8,11,2018,0.8,0.3,0.3,LIB,,,,0.3,OT,,,,,,,,,,Y,Y
+59155,"First Wind O&M, LLC",57082,Kaheawa Wind Power II LLC,HI,Maui,2,OP,Batteries,BA,IPP Non-CHP,2,10.0,10.0,10.0,6,2012,20.0,10.0,10.0,LIB,,,,10.0,BL,,Y,Y,Y,Y,,,,Y,Y,Y
+56641,Tonopah Solar Energy LLC,57275,Crescent Dunes Solar Energy,NV,Nye,TSE-1,OP,Solar Thermal with Energy Storage,CP,IPP Non-CHP,2,125.0,110.0,110.0,11,2015, , , ,,,,, ,,,,,,,,,,,,
+56678,FPL Energy Illinois Wind LLC,57325,FPL Energy Illinois Wind LLC Hybrid,IL,DeKalb,BFT,OP,Batteries,BA,IPP Non-CHP,2,20.0,20.0,20.0,11,2014,8.3,20.0,20.0,LIB,,,,0.0,CS,,Y,,,,,,,,,
+19740,AES Wind Generation Inc,57447,Laurel Mountain Hybrid,WV,Barbour,2,OP,Batteries,BA,IPP Non-CHP,2,16.0,16.0,16.0,10,2011,16.0,16.0,16.0,LIB,,,,0.0,CS,,Y,,,,,,,,,
+7353,Golden Valley Elec Assn Inc,57583,Battery Energy Storage System,AK,Fairbanks North Star,BESS,OP,Batteries,BA,Electric Utility,1,40.0,40.0,40.0,12,2003,11.0,4.0,40.0,NIB,,,,46.0,BL,,Y,,Y,,,,,Y,,N
+56918,University of California San Diego,57584,University of California San Diego Hybrid,CA,San Diego,BS1,OP,Batteries,BA,Commercial CHP,5,2.5,2.5,2.5,12,2015,2.5,2.5,2.5,LIB,,,,2.5,CS,,,Y,,,,Y,Y,,,
+57017,DOE National Renewable Energy Laboratory,57693,DOE Golden NWTC Research Side Hybrid,CO,Jefferson,AESBT,OP,Batteries,BA,Commercial Non-CHP,4,0.3,0.3,0.3,1,2019,0.3,0.3,0.3,LIB,,,,0.3,CS,,,,,,,,,,,Y
+57017,DOE National Renewable Energy Laboratory,57693,DOE Golden NWTC Research Side Hybrid,CO,Jefferson,NRELB,OP,Batteries,BA,Commercial Non-CHP,4,1.0,1.0,1.0,1,2019,1.0,1.0,1.0,LIB,,,,1.0,CS,,,,,,,,,,,Y
+61978,Convergent Energy and Power LP,57710,Stephentown Spindle,NY,Rensselaer,SRS1,OP,Flywheels,FW,IPP Non-CHP,2,20.0,20.0,20.0,1,2011,5.0,20.0,20.0,,,,,0.0,CS,,Y,,,,,,,,,
+61978,Convergent Energy and Power LP,57716,Hazle Spindle,PA,Luzerne,HRS1,OP,Flywheels,FW,IPP Non-CHP,2,20.0,20.0,20.0,9,2013,5.0,20.0,20.0,,,,,0.0,CS,,Y,,,,,,,,,
+57372,Auwahi Wind Energy LLC,57996,Auwahi Wind Energy Hybrid,HI,Maui,AWEB,OP,Batteries,BA,IPP Non-CHP,2,11.0,11.0,11.0,12,2012,4.4,11.0,11.0,LIB,,,,5.4,CS,,Y,,Y,,,,,,,
+10433,Kodiak Electric Assn Inc,58405,ESS Battery Microgrid,AK,Kodiak Island,1,OP,Batteries,BA,Electric Utility,1,3.0,3.0,3.0,11,2012,3.0,3.0,3.0,PBB,,,,3.0,CS,N,Y,Y,Y,Y,Y,Y,Y,Y,Y,Y
+58462,Battery Utility of Ohio LLC,58475,Battery Utility of Ohio,OH,Delaware,BOU,OP,Batteries,BA,IPP Non-CHP,2,4.0,4.0,4.0,3,2014,2.0,4.0,4.0,LIB,,,,4.0,CS,,Y,,,,,,,,,
+58489,OCI Solar Power,58537,OCI Alamo Solar I Hybrid,TX,Bexar,ASTRO,OP,Batteries,BA,IPP Non-CHP,2,1.0,1.0,1.0,8,2016,0.3,1.0,1.0,LIB,,,,0.6,CS,,Y,,,,,,,,,
+13781,Northern States Power Co - Minnesota,58579,Laverne Battery,MN,Rock,1,OP,Batteries,BA,Electric Utility,1,1.1,1.0,1.0,1,2013,7.6,1.0,1.0,NAB,,,,1.3,CS,,,,,,Y,,,,,
+58544,Sierra Nevada Brewing Co,58585,Sierra Nevada Brewing Co Hybrid,CA,Butte,BESS,OP,Batteries,BA,Industrial CHP,7,0.5,0.5,0.5,2,2017,1.0,0.5,0.5,LIB,,,,0.5,OT,,,,,,,Y,N,,,Y
+58549,County of Alameda GSA,58625,Santa Rita Jail Hybrid,CA,Alameda,SRJBA,OS,Batteries,BA,IPP CHP,3,2.0,2.0,2.0,7,2012,4.0,0.3,0.3,LIB,,,,2.0,CS,,,,,,,Y,,,,
+10071,Kauai Island Utility Cooperative,58639,KRS I Anahola Solar Hybrid,HI,Kauai,B5B6,OP,Batteries,BA,Electric Utility,1,6.0,6.0,6.0,8,2015,4.6,2.0,6.0,LIB,,,,6.0,CS,,Y,,,Y,,,,,Y,Y
+15473,Public Service Co of NM,58899,Prosperity Energy Storage Facility Hybrid,NM,Bernalillo,GEN-2,OP,Batteries,BA,Electric Utility,1,0.8,0.8,0.8,9,2011,1.3,0.5,0.5,PBB,,,,0.8,CS,Y,,,,,,Y,Y,,,Y
+14328,Pacific Gas & Electric Co.,59256,Vaca Dixon Battery Storage System,CA,Solano,BAT1,OP,Batteries,BA,Electric Utility,1,2.0,2.0,2.0,1,2013,14.0,2.0,2.0,NAB,,,,2.5,CS,Y,Y,,Y,,,,,,,
+14328,Pacific Gas & Electric Co.,59257,Yerba Buena,CA,Santa Clara,YB1,OP,Batteries,BA,Electric Utility,1,4.0,4.0,4.0,11,2013,28.0,4.0,4.0,NAB,,,,5.0,CS,Y,Y,,Y,,,,,,Y,
+17609,Southern California Edison Co,59661,Tehachapi Energy Storage Project,CA,Kern,TSP1,OP,Batteries,BA,Electric Utility,1,8.0,8.0,8.0,4,2016,32.0,8.0,8.0,LIB,,,,4.0,BL,N,N,N,Y,N,,N,,N,,N
+10000,Evergy Metro,59772,KCP&L SmartGrid Innovation Park,MO,Jackson,1,SB,Batteries,BA,Electric Utility,1,1.0,1.0,1.0,6,2012,1.0,1.0,1.0,LIB,,,,1.3,CS,,,,,,,Y,,,,
+59712,AES Tait LLC,59949,AES Warrior Run Energy Storage Project,MD,Allegany,BESS1,OP,Batteries,BA,IPP Non-CHP,2,11.0,5.0,5.0,12,2015,5.0,5.0,5.0,LIB,,,,5.0,BL,,Y,,,,,,,,,
+49893,Invenergy Services LLC,59957,Grand Ridge Battery Projects,IL,LaSalle,GIVB,OP,Batteries,BA,IPP Non-CHP,2,1.5,1.5,1.5,12,2013,1.0,1.5,1.5,LIB,,,,0.5,CT,,Y,,,,,,,,,
+49893,Invenergy Services LLC,59957,Grand Ridge Battery Projects,IL,LaSalle,GRES,OP,Batteries,BA,IPP Non-CHP,2,31.5,31.5,31.5,3,2015,12.5,31.5,31.5,LIB,,,,0.5,CT,,Y,,,,,,,,,
+59718,West Chicago Battery Storage LLC,59959,Elwood Energy Storage Center,IL,DuPage,WCBS,OP,Batteries,BA,IPP Non-CHP,2,19.8,19.8,19.8,10,2015,7.9,19.8,19.8,LIB,,,,22.0,CS,N,Y,,,,,,,,,
+59717,Joliet Battery Storage LLC,59960,Jake Energy Storage Center,IL,Will,JBS,OP,Batteries,BA,IPP Non-CHP,2,19.8,19.8,19.8,9,2015,7.9,19.8,19.8,LIB,,,,22.0,CS,,Y,,,,,,,,,
+6452,Florida Power & Light Co,59993,Babcock Solar Energy Center Hybrid,FL,Charlotte,BA,OP,Batteries,BA,Electric Utility,1,10.0,10.0,10.0,3,2018,40.0,10.0,10.0,LIB,,,,7.0,CS,,,,,Y,,,,,,Y
+733,Appalachian Power Co,59995,AEP Milton NaS,WV,Cabell,1,OP,Batteries,BA,Electric Utility,1,2.0,2.0,2.0,11,2009,2.0,2.0,2.0,NAB,,,,2.0,CS,,,,,,,,Y,,,
+17470,PUD 1 of Snohomish County,60016,MESA 1,WA,Snohomish,A,OP,Batteries,BA,Electric Utility,1,1.0,1.0,1.0,7,2015,0.5,1.0,1.0,LIB,,,,0.9,CS,Y,,,,,,Y,Y,,,
+17470,PUD 1 of Snohomish County,60016,MESA 1,WA,Snohomish,B,OP,Batteries,BA,Electric Utility,1,1.0,1.0,1.0,2,2016,0.5,1.0,1.0,LIB,,,,0.9,CS,Y,,,,,,Y,Y,,,
+17470,PUD 1 of Snohomish County,60021,MESA 2,WA,Snohomish,MESA2,OA,Batteries,BA,Electric Utility,1,2.4,2.2,2.2,7,2017,8.0,2.2,2.2,FLB,,,,2.2,CS,Y,,,,,,Y,Y,,,
+6452,Florida Power & Light Co,60061,Citrus Solar Energy Center Hybrid,FL,DeSoto,BA,OP,Batteries,BA,Electric Utility,1,4.0,4.0,4.0,3,2018,16.0,4.0,4.0,LIB,,,,0.0,CS,,,,,Y,,,,,,Y
+61123,Upton County Solar 2 LLC,60123,Castle Gap Solar Hybrid,TX,Upton,BAT1,OP,Batteries,BA,IPP Non-CHP,2,9.9,9.9,9.9,6,2019,42.0,9.9,9.9,LIB,,,,4.8,CS,,Y,Y,,,,,,,,Y
+59997,Customized Energy Solutions,60213,NA 1(Hagerstown),MD,Washington,MPSHG,OP,Batteries,BA,IPP Non-CHP,2,2.0,2.0,2.0,4,2017,1.0,2.0,2.0,LIB,,,,2.0,CS,,Y,,,,,,,,,
+60947,Tesla Inc.,60231,Genentech-Oceanside Hybrid,CA,San Diego,BA1,OP,Batteries,BA,IPP Non-CHP,2,2.0,2.0,2.0,4,2016,2.0,1.0,1.0,LIB,,,,1.0,CS,,,,,,,,Y,,Y,Y
+60094,"Clinton Battery Utility, LLC",60297,Clinton Battery,OH,Clinton,1,OP,Batteries,BA,IPP Non-CHP,2,10.0,10.0,10.0,10,2016,4.1,10.0,10.0,LIB,,,,3.2,CS,,Y,,,,,,,,,
+59209,"Half Moon Ventures, LLC",60299,HMV Minster Energy Storage System,OH,Auglaize,MIN02,OP,Batteries,BA,IPP Non-CHP,2,7.0,7.0,7.0,3,2016,7.0,7.0,7.0,LIB,,,,5.3,CS,,Y,,,,,,Y,Y,,
+49893,Invenergy Services LLC,60390,Beech Ridge Energy Storage,WV,Greenbrier,BRES,OP,Batteries,BA,IPP Non-CHP,2,31.5,31.5,31.5,10,2015,12.5,31.5,31.5,LIB,,,,0.5,CT,,Y,,,,,,,,,
+15248,Portland General Electric Co,60441,Salem Smart Power Center,OR,Marion,SSPC,SB,Batteries,BA,Electric Utility,1,5.0,5.0,5.0,8,2013,1.3,5.0,5.0,LIB,,,,5.0,BL,,Y,,,Y,,Y,Y,,,
+15500,Puget Sound Energy Inc,60444,Glacier Battery Storage,WA,Whatcom,GLA,OP,Batteries,BA,Electric Utility,1,2.0,2.0,2.0,9,2016,4.4,2.0,2.0,LIB,,,,2.0,CT,Y,Y,Y,Y,,,Y,,,Y,
+60278,64KT 8me LLC,60491,Springbok 3 Solar Farm Hybrid,CA,Kern,SB3BS,OP,Batteries,BA,IPP Non-CHP,2,1.5,1.5,1.5,7,2019,1.5,1.5,1.5,LIB,,,,1.5,CT,,Y,,,,,,,Y,,Y
+50174,Electric Transmission Texas LLC,60506,ETT Presidio NaS Battery,TX,Presidio,BOB,OP,Batteries,BA,IPP Non-CHP,2,4.0,4.0,4.0,3,2010,4.0,4.0,4.0,NAB,,,,4.0,BL,,,,,,,,,,Y,
+7601,Green Mountain Power Corp,60518,Stafford Hill Solar Hybrid,VT,Rutland,BA1,OP,Batteries,BA,Electric Utility,1,2.0,2.0,2.0,9,2015,3.4,2.0,2.0,LIB,PBB,,,0.5,CS,,Y,,,,,Y,,,,Y
+60947,Tesla Inc.,60546,KIUC Kapaia PV and BA Storage Project Hybrid,HI,Kauai,BA1,OP,Batteries,BA,IPP Non-CHP,2,13.0,11.0,11.0,5,2017,52.0,11.0,11.0,LIB,,,,7.8,CS,,,,,,,,,,,Y
+7140,Georgia Power Co,60561,Cedartown Battery Energy Storage Project,GA,Polk,1,OP,Batteries,BA,Electric Utility,1,1.0,1.0,1.0,10,2015,2.0,1.0,1.0,LIB,,,,1.5,CT,,,N,,Y,Y,Y,Y,N,,Y
+7601,Green Mountain Power Corp,60562,GMP Solar - Panton Hybrid,VT,Addison,GMPBP,OP,Batteries,BA,Electric Utility,1,1.0,1.0,1.0,6,2018,4.0,1.0,1.0,LIB,,,,1.0,OT,,Y,,,,,Y,,,,Y
+10433,Kodiak Electric Assn Inc,60563,Flywheel Energy Storage System Microgrid,AK,Kodiak Island,FESS,OP,Flywheels,FW,Electric Utility,1,2.0,2.0,2.0,9,2015,2.0,2.0,2.0,,,,,2.0,CS,,Y,Y,Y,Y,Y,Y,Y,Y,Y,Y
+60336,SDGE Batteries,60565,Borrego Springs Energy Storage,CA,San Diego,SES1,OP,Batteries,BA,Electric Utility,1,0.5,0.5,0.5,12,2012,1.5,0.5,0.5,LIB,,,,1.5,CS,N,,,,,,Y,,,N,
+60336,SDGE Batteries,60565,Borrego Springs Energy Storage,CA,San Diego,SES2,OP,Batteries,BA,Electric Utility,1,1.0,1.0,1.0,2,2014,3.0,1.0,1.0,LIB,,,,1.5,CS,,,,,,,Y,,,Y,
+60336,SDGE Batteries,60566,Pala Energy Storage Yard,CA,San Diego,SES1,OP,Batteries,BA,Electric Utility,1,0.5,0.5,0.5,12,2012,1.5,0.5,0.5,LIB,,,,1.5,CS,,,,,,,Y,,,N,N
+60336,SDGE Batteries,60566,Pala Energy Storage Yard,CA,San Diego,SES2,OP,Batteries,BA,Electric Utility,1,1.0,1.0,1.0,8,2015,2.0,1.0,1.0,LIB,,,,1.5,CS,,,,,,,Y,,,N,N
+60336,SDGE Batteries,60567,Ortega Highway Energy Storage,CA,Orange,SES1,OP,Batteries,BA,Electric Utility,1,1.0,1.0,1.0,5,2015,3.0,1.0,1.0,LIB,,,,2.0,CS,,,,,,,Y,Y,,Y,
+60336,SDGE Batteries,60567,Ortega Highway Energy Storage,CA,Orange,SES2,OP,Batteries,BA,Electric Utility,1,1.0,1.0,1.0,10,2015,3.0,1.0,1.0,LIB,,,,2.0,CS,,,,,,,Y,Y,,Y,
+60336,SDGE Batteries,60568,Canyon Crest Academy,CA,San Diego,SES,OP,Batteries,BA,Electric Utility,1,1.0,1.0,1.0,10,2014,3.0,1.0,1.0,LIB,,,,1.0,CS,,,,,,,Y,Y,,Y,
+16609,San Diego Gas & Electric Co,60569,El Cajon Energy Storage,CA,San Diego,SES,OP,Batteries,BA,Electric Utility,1,7.5,7.5,7.5,2,2017,30.0,7.5,7.5,LIB,,,,7.5,CS,Y,,,,,,,,,Y,
+16609,San Diego Gas & Electric Co,60570,Escondido Energy Storage,CA,San Diego,SES,OP,Batteries,BA,Electric Utility,1,30.0,30.0,30.0,3,2017,120.0,30.0,30.0,LIB,,,,30.0,CS,Y,,,,,,,,,,
+60947,Tesla Inc.,60607,CMEEC - Polaris Park Solar Hybrid,CT,New London,BA1,OP,Batteries,BA,IPP Non-CHP,2,0.8,0.8,0.8,8,2017,3.3,0.8,0.8,LIB,,,,1.0,CS,,,,,,,,,,,Y
+60947,Tesla Inc.,60609,CMEEC - Norwich Stott St Solar Hybrid,CT,New London,BA1,OP,Batteries,BA,IPP Non-CHP,2,0.8,0.8,0.8,12,2016,3.0,0.8,0.8,LIB,,,,1.0,CS,,,,,,,N,,,Y,Y
+9324,Indiana Michigan Power Co,60617,AEP Churubusco NaS,IN,Whitley,1,OP,Batteries,BA,Electric Utility,1,2.0,2.0,2.0,1,2009,2.0,2.0,2.0,NAB,,,,2.0,CS,,,,,,,,Y,,,
+14006,Ohio Power Co,60618,AEP Bluffton NaS,OH,Allen,1,OP,Batteries,BA,Electric Utility,1,2.0,2.0,2.0,12,2008,2.0,2.0,2.0,NAB,,,,2.0,CS,,,,,,,,Y,,,
+57170,"EDF Renewable Asset Holdings, Inc.",60656,McHenry Battery Storage,IL,McHenry,MCH1,OP,Batteries,BA,IPP Non-CHP,2,19.8,19.8,19.8,2,2016,7.8,19.8,19.8,LIB,,,,6.1,CS,,Y,,,,,,,,,
+60394,"Willey Battery Utility, LLC",60660,Willey Battery Utility,OH,Hamilton,WBU,OP,Batteries,BA,IPP Non-CHP,2,6.0,6.0,6.0,1,2016,2.0,6.0,6.0,LIB,,,,6.0,CS,,Y,,,,,,,,,
+17609,Southern California Edison Co,60661,Mira Loma Energy Storage Facility,CA,San Bernardino,013A,OP,Batteries,BA,Electric Utility,1,10.0,10.0,10.0,12,2016,40.0,10.0,10.0,LIB,,,,3.3,CS,Y,Y,Y,Y,,Y,Y,Y,Y,,
+17609,Southern California Edison Co,60661,Mira Loma Energy Storage Facility,CA,San Bernardino,013B,OP,Batteries,BA,Electric Utility,1,10.0,10.0,10.0,12,2016,40.0,10.0,10.0,LIB,,,,3.3,CS,Y,Y,Y,Y,,Y,Y,Y,Y,,
+60409,"Blue Summit Storage, LLC",60690,"Blue Summit Storage, LLC",TX,Wilbarger,WBSS,OP,Batteries,BA,IPP Non-CHP,2,30.0,30.0,30.0,8,2017,12.6,30.0,30.0,LIB,,,,12.5,CS,,Y,,,,,,,,,
+61198,esVolta LP,60760,Millikan BESS,CA,Orange,PE101,OP,Batteries,BA,IPP Non-CHP,2,2.0,2.0,2.0,12,2016,8.0,2.0,2.0,LIB,,,,2.0,BL,Y,Y,,,,,N,,,,
+60947,Tesla Inc.,60815,Hampshire College Hybrid,MA,Hampshire,BA1,OP,Batteries,BA,IPP Non-CHP,2,0.5,0.5,0.5,5,2017,0.5,0.3,0.3,LIB,,,,0.3,CS,,,,,,,Y,,,Y,Y
+60947,Tesla Inc.,60815,Hampshire College Hybrid,MA,Hampshire,BA2,OP,Batteries,BA,IPP Non-CHP,2,0.5,0.5,0.5,12,2017,0.5,0.3,0.3,LIB,,,,0.3,CS,,,,,,,Y,,,Y,Y
+60471,"Mt. Tom Solar, LLC",60906,Mt. Tom Solar Project Hybrid,MA,Hampden,BA1,OP,Batteries,BA,IPP Non-CHP,2,3.1,3.1,3.1,3,2019,6.1,2.0,3.1,LIB,,,,2.3,CS,,,,,,,N,Y,,,Y
+58375,Sterling Municipal Light Department,60959,Chocksett Rd Energy Storage Project,MA,Worcester,BA1,OP,Batteries,BA,Electric Utility,1,2.0,3.9,3.9,4,2017,3.9,2.0,2.0,LIB,,,,1.0,CS,,,,,,,,,,Y,
+7294,City of Glendale - (CA),60974,Glendale Battery Energy Storage System,CA,Los Angeles,2BESS,OP,Batteries,BA,Electric Utility,1,2.0,2.0,2.0,10,2017,1.0,1.0,2.0,LIB,,,,2.0,CS,,,,,,Y,,,,,
+60633,"Iron Horse Battery Storage, LLC",60996,Iron Horse Battery Storage Hybrid,AZ,Pima,BA1,OP,Batteries,BA,IPP Non-CHP,2,10.0,10.0,10.0,4,2017,2.5,10.0,10.0,LIB,,,,10.0,CS,,Y,,,,,,,,,Y
+60691,"AES LAWAI SOLAR, LLC",61068,AES LAWAI SOLAR Hybrid,HI,Kauai,LAWA2,OP,Batteries,BA,IPP Non-CHP,2,20.0,20.0,20.0,12,2018,100.0,20.0,20.0,LIB,,,,20.0,CS,,,,,,,Y,,,,Y
+60723,VRF Battery Plant,61107,Vanadium Redox Flow Battery Plant,CA,San Diego,VRF,OP,Batteries,BA,Electric Utility,1,2.0,2.0,2.0,6,2017,8.0,2.0,2.0,FLB,,,,2.3,CS,,Y,Y,,Y,,Y,Y,Y,,N
+60834,Pima Energy Storage System,61197,Pima Energy Storage System,AZ,Pima,PIMA,OP,Batteries,BA,IPP Non-CHP,2,10.0,10.0,10.0,1,2017,2.5,8.0,10.0,LIB,,,,2.9,CS,,Y,,,,,,,,,
+17633,Southern Indiana Gas & Elec Co,61334,Volkman Road Solar Array Hybrid,IN,Vanderburgh,VRSA2,OP,Batteries,BA,Electric Utility,1,1.0,1.0,1.0,1,2019,4.6,1.0,1.0,LIB,,,,1.2,CT,,,,,,,Y,,,,Y
+54888,NRG Texas Power LLC,61362,NRG Elbow Creek Energy Storage Project,TX,Howard,ECBS,OP,Batteries,BA,IPP Non-CHP,2,2.0,2.0,2.0,11,2017,0.7,2.0,2.0,LIB,,,,2.0,CS,Y,Y,,,,,,,,,N
+11208,Los Angeles Department of Water & Power,61431,Beacon BESS 1,CA,Kern,BCNB1,OA,Batteries,BA,Electric Utility,1,20.0,20.0,20.0,10,2018,10.0,20.0,20.0,LIB,,,,15.0,CS,,Y,,,Y,,,,Y,,Y
+15466,Public Service Co of Colorado,61439,Panasonic Carport Solar Hybrid,CO,Adams,PANBS,OP,Batteries,BA,Electric Utility,1,1.0,1.0,1.0,8,2017,2.2,1.0,1.0,LIB,,,,1.0,CS,Y,Y,,Y,,,,,,Y,Y
+61091,Hopewell Valley High School,61473,Hopewell Valley High School Hybrid,NJ,Mercer,BA1,OP,Batteries,BA,Electric Utility,1,1.0,1.0,1.0,12,2015,1.0,0.5,0.5,LIB,,,,0.5,BL,,,,,,,,,,,Y
+13478,"Entergy New Orleans, LLC",61647,New Orleans Solar Power Plant,LA,Orleans,NOSPB,OP,Batteries,BA,Electric Utility,1,0.5,0.5,0.5,6,2016,0.5,0.5,0.5,LIB,,,,0.4,CS,,Y,,,Y,,,Y,Y,,Y
+61277,"Vista Energy Storage, LLC",61661,Vista Energy Storage System ,CA,San Diego,VISTA,OP,Batteries,BA,IPP Non-CHP,2,40.0,40.0,40.0,6,2018,40.0,40.0,40.0,LIB,,,,40.0,BL,Y,Y,,Y,,,,,,,
+61295,"Pinal Central Energy Center, LLC",61678,Pinal Central Energy Center Hybrid,AZ,Pinal,BA1,OP,Batteries,BA,IPP Non-CHP,2,10.0,10.0,10.0,4,2018,40.0,10.0,10.0,LIB,,,,10.0,CS,,,,,,,Y,,,,Y
+17833,City Utilities of Springfield - (MO),61679,Cox Battery Energy Storage,MO,Greene,1,OP,Batteries,BA,Electric Utility,1,1.2,1.2,1.2,9,2017,1.5,1.2,1.0,PBB,,,,1.2,CS,,,,,,,,Y,,,
+61344,Advanced Microgrid Solutions,61721,HEBT WLA 1,CA,Orange,WLA01,OP,Batteries,BA,Commercial Non-CHP,4,1.0,1.0,1.0,8,2019,6.9,1.0,1.0,LIB,,,,1.0,OT,Y,,,,,,Y,Y,,,
+61344,Advanced Microgrid Solutions,61722,HEBT Irvine 1,CA,Orange,IRV01,OP,Batteries,BA,IPP Non-CHP,2,1.0,1.0,1.0,5,2018,6.5,1.0,1.0,LIB,,,,1.0,OT,,,,,,,Y,Y,,,
+61344,Advanced Microgrid Solutions,61722,HEBT Irvine 1,CA,Orange,IRV1W,OP,Batteries,BA,IPP Non-CHP,2,4.5,4.5,4.5,5,2018,27.0,4.5,4.5,LIB,,,,4.5,OT,,,,,,,Y,Y,,,
+61344,Advanced Microgrid Solutions,61723,HEBT Irvine 2,CA,Orange,IRV06,OP,Batteries,BA,IPP Non-CHP,2,2.5,2.5,2.5,8,2018,15.0,2.5,2.5,LIB,,,,2.5,OT,,,,,,,Y,Y,,,
+61344,Advanced Microgrid Solutions,61723,HEBT Irvine 2,CA,Orange,IRV2W,OP,Batteries,BA,IPP Non-CHP,2,3.3,3.3,3.3,2,2018,19.8,3.3,3.3,LIB,,,,3.3,OT,,,,,,,Y,Y,,,
+58764,"Origis Energy USA, Inc",61730,MA Solar Storage 1 Hybrid,MA,Worcester,61730,OP,Batteries,BA,IPP Non-CHP,2,1.0,1.0,1.0,4,2018,2.0,1.0,1.0,LIB,,,,1.0,CS,Y,,,,,,Y,,,,Y
+61364,Lockheed Martin RMS Syracuse,61739,Lockheed Martin RMS Syracuse,NY,Onondaga,SYR1,OP,Batteries,BA,Industrial Non-CHP,6,1.0,1.0,1.0,8,2017,1.3,1.0,1.0,LIB,,,,1.0,CS,Y,,,,,,Y,Y,,,
+1015,Austin Energy,61741,Kingsberry Energy Storage System,TX,Travis,KBESS,OP,Batteries,BA,Electric Utility,1,1.5,1.5,1.5,9,2018,3.0,1.5,1.5,LIB,,,,1.5,CS,Y,,Y,,Y,,Y,Y,Y,N,Y
+1015,Austin Energy,61742,System Control Center,TX,Travis,GEN1,SB,Flywheels,FW,Electric Utility,1,2.5,2.5,2.5,6,2012,2.5,2.5,2.5,,,,,0.0,CS,,,,,,,,,,Y,
+1015,Austin Energy,61742,System Control Center,TX,Travis,GEN2,SB,Flywheels,FW,Electric Utility,1,2.5,2.5,2.5,6,2012,2.5,2.5,2.5,,,,,0.0,CS,,,,,,,,,,Y,
+19547,Hawaiian Electric Co Inc,61851,Campbell Industrial Park BESS,HI,Honolulu,CIPB1,OP,Batteries,BA,Electric Utility,1,1.0,1.0,1.0,3,2016,0.3,1.0,1.0,LIB,,,,1.0,CS,,,Y,,Y,,,,Y,,
+61482,"AES ES GILBERT, LLC",61861,AES ES GILBERT,AZ,Maricopa,SRP,OP,Batteries,BA,IPP Non-CHP,2,10.0,10.0,10.0,1,2019,40.0,10.0,10.0,LIB,,,,10.0,BL,Y,,,,,,,,,,
+61506,"Stryker 22, L.L.C.",61891,"Stryker 22, L.L.C.",NJ,Warren,EDGRD,OP,Batteries,BA,IPP Non-CHP,2,19.8,19.8,19.8,12,2018,19.8,19.8,19.8,LIB,,,,19.8,CS,,Y,,,,,,,,,
+61507,Plumsted 537 LLC,61892,Plumsted 537 LLC,NJ,Ocean,PLMST,OP,Batteries,BA,IPP Non-CHP,2,19.8,19.8,19.8,2,2019,19.8,19.8,19.8,LIB,,,,19.8,CS,,Y,,,,,,,,,
+61513,"Redstone Solar I, LLC",61901,Redstone Arsenal Hybrid,AL,Madison,BA,OP,Batteries,BA,IPP Non-CHP,2,1.0,1.0,1.0,12,2017,2.0,0.5,0.5,LIB,,,,1.0,CS,Y,,,,,,,,,,Y
+4254,Consumers Energy Co,61909,Parkview Battery,MI,Kalamazoo,PKVWB,OP,Batteries,BA,Electric Utility,1,1.1,1.0,1.0,9,2018,1.0,1.1,1.1,LIB,,,,1.1,CS,,,,,,,Y,,,,Y
+803,Arizona Public Service Co,61913,Punkin Center Battery Storage,AZ,Gila,B1,OP,Batteries,BA,Electric Utility,1,2.0,2.0,2.0,6,2018,8.0,2.0,2.0,LIB,,,,2.2,CS,,Y,,,,,,,,Y,
+61522,"Viridity Energy Solutions, Inc.",61923,ACUA,NJ,Atlantic,VACUA,OP,Batteries,BA,IPP Non-CHP,2,1.0,1.0,1.0,6,2018,1.0,1.0,1.0,LIB,,,,1.0,CS,,Y,,,,,,,,,
+61531,"Casa Mesa Wind, LLC",61925,Casa Mesa Wind Energy Center Hybrid,NM,Quay,CMNMB,OP,Batteries,BA,IPP Non-CHP,2,1.0,1.0,1.0,11,2018,1.0,1.0,1.0,LIB,,,,12.5,CS,,Y,,,,,,,,,Y
+60146,Ameresco Federal Solutions,61956,MCRD Parris Island PV Hybrid,SC,Beaufort,TBESS,OP,Batteries,BA,IPP Non-CHP,2,4.0,4.0,4.0,12,2018,4.0,4.0,4.0,LIB,,,,4.0,CS,,,,,,,,,,,Y
+61576,Ameren Illinois,61990,TAC-Distributed Energy Resource Hybrid,IL,Champaign,BA,OP,Batteries,BA,Electric Utility,1,0.3,0.3,0.3,5,2017,0.5,0.3,0.3,LIB,,,,0.3,CT,N,,,,,,N,N,,Y,
+61872,Gavilan District College Solar Project,61993,Gavilan District College Solar Project,CA,Santa Clara,GDCBA,OP,Batteries,BA,IPP Non-CHP,2,0.5,0.5,0.5,6,2019,0.5,0.2,0.3,LIB,,,,0.3,CS,,,,,,,,,,N,Y
+61591,"Solar University, LLC",61995,UC Merced Solar Hybrid,CA,Merced,UCMBA,OP,Batteries,BA,IPP Non-CHP,2,0.5,0.5,0.5,12,2018,0.9,0.5,0.5,LIB,,,,0.5,CS,N,,,,,,Y,,,,Y
+61597,Caldwell Wastewater Treatment Plant,62027,Caldwell Wastewater Treatment Plant Hybrid,NJ,Essex,BAT1,OP,Batteries,BA,IPP Non-CHP,2,1.0,0.5,0.5,12,2016,2.0,0.5,0.5,OTH,,,,0.5,OT,,Y,,,Y,,,,,Y,Y
+61687,"KCE NY 1, LLC",62147,KCE NY 1,NY,Saratoga,KNY1,OP,Batteries,BA,IPP Non-CHP,2,20.0,20.0,20.0,3,2019,8.4,20.0,20.0,LIB,,,,6.5,CS,,Y,,,,,,,,,
+11806,Massachusetts Mun Wholes Electric Co,62219,Ashburnham Energy Storage Project,MA,Worcester,AMLPB,OP,Batteries,BA,Electric Utility,1,3.0,3.0,3.0,3,2019,3.0,3.0,3.0,LIB,,,,3.0,CT,,,,,,N,Y,,,,
+2144,Town of Braintree - (MA),62257,Station 9 Energy Storage System,MA,Norfolk,ESS1,OP,Batteries,BA,Electric Utility,1,2.0,2.0,2.0,6,2018,4.2,2.0,2.0,LIB,,,,2.0,CS,,,,,,,Y,,,,
+19499,"United Power, Inc",62373,I25 Battery Storage,CO,Weld,I25BA,OP,Batteries,BA,Electric Utility,1,4.0,4.0,4.0,12,2018,16.0,4.0,4.0,LIB,,,,0.4,CS,,,,,,,Y,,,,
+7601,Green Mountain Power Corp,62381,GMP Solar/Storage-Milton Hybrid,VT,Chittenden,GMPBM,OP,Batteries,BA,Electric Utility,1,2.0,2.0,2.0,9,2019,8.0,2.0,2.0,LIB,,,,2.0,OT,,Y,Y,,,,Y,Y,,,Y
+7601,Green Mountain Power Corp,62382,GMP Solar/Storage-Ferrisburgh Hybrid,VT,Addison,GMPBF,OP,Batteries,BA,Electric Utility,1,2.0,2.0,2.0,9,2019,8.0,2.0,2.0,LIB,,,,2.0,OT,,Y,Y,,,,Y,Y,,,Y
+7601,Green Mountain Power Corp,62383,GMP Solar/Storage-Essex Hybrid,VT,Chittenden,GMPBE,OP,Batteries,BA,Electric Utility,1,2.0,2.0,2.0,9,2019,8.0,2.0,2.0,LIB,,,,2.0,OT,,Y,N,,,,Y,Y,,,Y
+61728,GlidePath Power Operations LLC,62444,Meyersdale Battery,PA,Somerset,BMY,OP,Batteries,BA,IPP Non-CHP,2,18.0,18.0,18.0,12,2015,12.1,18.0,18.0,LIB,,,,18.0,CT,,Y,,,,,,,,,
+12341,MidAmerican Energy Co,62569,Knoxville Battery Energy Storage,IA,Marion,ES1,OP,Batteries,BA,Electric Utility,1,1.1,1.1,1.1,12,2018,4.0,1.1,1.1,LIB,,,,1.1,CS,Y,,,,,,,,,,
+11806,Massachusetts Mun Wholes Electric Co,62585,Beebe Substation Battery Storage,MA,Middlesex,WAKFD,OP,Batteries,BA,Electric Utility,1,3.0,3.0,3.0,3,2019,3.0,3.0,3.0,LIB,,,,3.0,CT,,,,,,,Y,,,,
+16604,City of San Antonio - (TX),62609,Commerce ESS,TX,Bexar,BA1,OP,Batteries,BA,Electric Utility,1,10.0,10.0,10.0,6,2019,10.0,10.0,10.0,LIB,,,,10.0,CS,Y,Y,,,,,,,,,Y
+62122,"Minuteman Eenergy Storage, LLC",62644,Minuteman Energy Storage,MA,Middlesex,MMES,OP,Batteries,BA,IPP Non-CHP,2,5.0,5.0,5.0,5,2019,10.0,5.0,5.0,LIB,,,,5.0,CS,,,,,,,Y,Y,,,
+62123,"SunRaise Investments, LLC",62652,Happy Hollow CSG Hybrid,MA,Worcester,HHESS,OP,Batteries,BA,IPP Non-CHP,2,3.3,3.3,3.3,10,2019,6.6,3.3,3.3,LIB,,,,3.3,CS,N,N,,,,,,,,,Y
+61204,"Today's Power, Inc.",62682,Noland Wastewater Treatment Plant Hybrid,AR,Washington,FAYEB,OP,Batteries,BA,Commercial Non-CHP,4,6.0,6.0,6.0,7,2019,13.1,6.0,6.0,LIB,,,,6.0,BL,,,,,,,Y,,,,
+61204,"Today's Power, Inc.",62683,Westside Wastewater Treatment Plant Hybrid,AR,Washington,FAYWB,OP,Batteries,BA,Commercial Non-CHP,4,6.0,6.0,6.0,7,2019,13.1,6.0,6.0,LIB,,,,6.0,BL,,,,,,,Y,,,,
+40215,"Cordova Electric Coop, Inc",62714,Eyak Service Center BESS,AK,Valdez Cordova,BESS1,OP,Batteries,BA,Electric Utility,1,1.0,1.0,1.0,8,2019,0.9,1.0,1.0,LIB,,,,0.8,CS,,Y,Y,Y,,,Y,Y,Y,,
+62652,"East Hampton Energy Storage Center, LLC",62733,East Hampton Energy Storage Center,NY,Suffolk,BEH,OP,Batteries,BA,IPP Non-CHP,2,5.0,5.0,5.0,8,2018,40.0,5.0,5.0,LIB,,,,5.0,BL,Y,,,Y,,,Y,,Y,,
+62651,"Montauk Energy Storage Center, LLC",62734,Montauk Energy Storage Center,NY,Suffolk,BME,OP,Batteries,BA,IPP Non-CHP,2,5.0,5.0,5.0,2,2019,40.0,5.0,5.0,LIB,,,,0.7,BL,,,,,,,Y,,,,
+63332,Acushnet,62835,Acushnet Ball Plant 2,MA,Bristol,ESS-1,OP,Batteries,BA,Industrial Non-CHP,6,1.0,1.0,1.0,6,2019,2.0,1.0,1.0,LIB,,,,1.0,CS,,,,,,,Y,,,,Y
+63332,Acushnet,62835,Acushnet Ball Plant 2,MA,Bristol,ESS-2,OP,Batteries,BA,Industrial Non-CHP,6,0.5,0.5,0.5,6,2019,1.0,0.5,0.5,LIB,,,,0.5,CS,,,,,,,Y,,,,Y
+62707,Marengo Battery Storage LLC,62856,Marengo Battery Storage LLC,IL,McHenry,MBSS,OP,Batteries,BA,IPP Non-CHP,2,20.0,20.0,20.0,12,2018,20.0,20.0,20.0,LIB,,,,23.4,CS,,Y,,,,,,,,,
+61522,"Viridity Energy Solutions, Inc.",62907,Hinesburg,VT,Chittenden,VEC,OP,Batteries,BA,IPP Non-CHP,2,1.9,1.9,1.9,9,2019,1.9,1.9,1.9,LIB,,,,1.9,CS,,Y,Y,,,,Y,,,,
+62731,"Gopher Energy Storage, LLC",62908,Anoka BESS,MN,Anoka,BA,OP,Batteries,BA,IPP Non-CHP,2,6.0,6.0,6.0,12,2018,12.0,6.0,6.0,LIB,,,,4.9,CS,,,,,,Y,Y,,,,Y
+62731,"Gopher Energy Storage, LLC",62937,Athens BESS,MN,Isanti,BA,OP,Batteries,BA,IPP Non-CHP,2,6.0,6.0,6.0,12,2018,12.0,6.0,6.0,LIB,,,,4.9,CS,,,,,Y,,Y,,,,Y
+56404,National Grid,62981,East Pulaski BESS,NY,Oswego,BESS,OP,Batteries,BA,Electric Utility,1,2.0,2.0,2.0,12,2018,4.2,2.0,2.0,LIB,,,,0.6,CS,,,Y,,,Y,Y,,,,
+62876,"Department of the Army, Fort Carson",63022,Fort Carson Battery Energy Storage System,CO,El Paso,1,OP,Batteries,BA,Commercial Non-CHP,4,4.2,4.2,4.2,12,2018,8.5,4.2,4.2,LIB,,,,1.4,CS,,,,,,,,Y,,,
+62731,"Gopher Energy Storage, LLC",63090,Athens - Coopers Corner BESS,MN,Isanti,COOPR,OP,Batteries,BA,IPP Non-CHP,2,3.0,3.0,3.0,12,2018,6.0,3.0,3.0,LIB,,,,4.9,CS,,,,,Y,,Y,,,,Y
+62894,Imeson Solar Farm LLC,63186,Imeson Solar,FL,Duval,IMESS,OP,Batteries,BA,IPP Non-CHP,2,5.0,5.0,5.0,12,2019,3.8,1.5,1.5,LIB,,,,4.0,CS,,,,,,,Y,,,,
+15470,"Duke Energy Indiana, LLC",63324,Camp Atterbury Microgrid Hybrid,IN,Johnson,ES1,OP,Batteries,BA,Electric Utility,1,5.0,5.0,5.0,11,2019,5.0,5.0,5.0,FLB,,,,3.3,BL,,Y,,,,,Y,,,Y,Y
+63163,Kearsarge Amesbury LLC,63398,Kearsarge Amesbury Hybrid,MA,Essex,AMBAT,OP,Batteries,BA,IPP Non-CHP,2,1.6,1.6,1.6,12,2019,3.8,1.5,1.5,LIB,,,,1.6,CS,,,,,Y,,,,,,Y
+63246,"EDF Renewables Distributed Solutions, Inc",63412,San Diego Zoo,CA,San Diego,SDZOO,OP,Batteries,BA,IPP Non-CHP,2,1.0,1.0,1.0,10,2019,4.0,1.0,1.0,LIB,,,,1.6,CS,N,,,,,,Y,,,,
+61344,Advanced Microgrid Solutions,63609,Allergan,CA,Orange,ALRGN,OP,Batteries,BA,Commercial Non-CHP,4,1.5,1.5,1.5,7,2019,9.0,1.5,1.5,LIB,,,,1.5,OT,Y,,,,,,,Y,,,
+61344,Advanced Microgrid Solutions,63610,Baker,CA,Orange,BAKER,OP,Batteries,BA,Commercial Non-CHP,4,1.2,1.2,1.2,4,2019,6.3,1.2,1.2,LIB,,,,1.2,OT,Y,,,,,,Y,N,,,
+61344,Advanced Microgrid Solutions,63611,CSU Long Beach,CA,Los Angeles,CSULB,OP,Batteries,BA,Commercial Non-CHP,4,2.5,2.5,2.5,3,2017,15.0,2.5,2.5,LIB,,,,2.5,OT,Y,,,,,,Y,,,,
+61344,Advanced Microgrid Solutions,63612,DATS,CA,Orange,DATS0,OP,Batteries,BA,Commercial Non-CHP,4,1.0,1.0,1.0,4,2017,6.0,1.0,1.0,LIB,,,,1.0,OT,Y,,,,,,Y,,,,
+61344,Advanced Microgrid Solutions,63613,Downey,CA,Los Angeles,DOWNY,OP,Batteries,BA,Commercial Non-CHP,4,2.0,2.0,2.0,12,2019,13.0,2.0,2.0,LIB,,,,2.0,OT,Y,,,,,,Y,,,,
+61344,Advanced Microgrid Solutions,63614,LAWRP,CA,Orange,LAWRP,OP,Batteries,BA,Commercial Non-CHP,4,1.0,1.0,1.0,4,2019,5.0,1.0,1.0,LIB,,,,1.0,OT,Y,,,,,,Y,,,,
+61344,Advanced Microgrid Solutions,63615,Long Beach Convention Center,CA,Los Angeles,LBCON,OP,Batteries,BA,Commercial Non-CHP,4,1.5,1.5,1.5,4,2019,8.6,1.5,1.5,LIB,,,,1.5,OT,Y,,,,,,Y,,,,
+61344,Advanced Microgrid Solutions,63616,OCSD,CA,Orange,OCSD1,OP,Batteries,BA,Commercial Non-CHP,4,4.9,4.9,4.9,8,2019,32.6,4.9,4.9,LIB,,,,4.9,OT,Y,,,,,,Y,,,,
+61344,Advanced Microgrid Solutions,63617,SOCCD,CA,Orange,SOCCD,OP,Batteries,BA,Commercial Non-CHP,4,1.3,1.3,1.3,6,2019,7.2,1.3,1.3,LIB,,,,1.3,OT,Y,,,,,,Y,,,,

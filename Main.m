@@ -1,44 +1,30 @@
-% PHORUM (PJM Hourly Open-source Reduced-form Unit commitment Model) 
-% Copyright (C) 2013  Roger Lueken, 2016 Allison Weis
-% Main.m
-% 
-% This program is free software: you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-% 
-% This program is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details.
-
-% You should have received a copy of the GNU General Public License
-% along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-% You can contact the author at rlueken@gmail.com, or mail to:
-% Roger Lueken
-% Department of Engineering and Public Policy
-% Carnegie Mellon University
-% Baker Hall 129
-% 5000 Forbes Avenue
-% Pittsburgh, PA 15213
-
 % This is the primary PHORUM Matlab function.  The function makes 
 % several sub-function calls, and is responsible for calling GAMS. 
 % The function loads data from the database file and settings file.
 
-function Main()
-
+function Main(settingsFileSuffix) %ex: UCtesla_2019
 %% Load settings
-load('settings');
-%saddpath(settings.GAMSpath);
-
-% Optimization window - number of hours in each optimization
-optWindow = 48;
-
+load(strcat('Inputs\Settings\settings',settingsFileSuffix));
+addpath(settings.GAMSpath);
+thisDir = pwd();
+%% Set up a working directory for this test case
+dirStringPrefix = settings.EVdataFile;
+if strlength(dirStringPrefix)==0 dirStringPrefix ='NoEV'; end
+dirString = strcat(dirStringPrefix,'_CC',string(settings.isControlledCharging), '_',string(settings.year),'_Txn',string(settings.isTransmissionConstraints));
+if strlength(settings.suffix)>0; dirString = strcat(dirString,'_',settings.suffix); end
+mkdir(strcat('Cases\',dirString));
+mkdir(strcat('Cases\',dirString,'\solver_logs'));
+%% Save an archive of the code that's currently running this test case
+zip(strcat('CodeBackup_',dirString),{'*.m','Models'}); movefile(strcat('CodeBackup_',dirString,'.zip'),strcat('Cases\',dirString));
+%% Move the GAMS model we will use into the working directory
+if settings.isTransmissionConstraints txnString = 'Trans'; else txnString = 'NoTrans'; end
+if settings.isControlledCharging chgString = 'CC'; else chgString = 'NoCC'; end
+modelFile = strcat('PHORUM_',txnString,'_',chgString);
+copyfile(strcat('Models\',modelFile,'.gms'),strcat('Cases\',dirString));
+copyfile(strcat('Models\*.opt'),strcat('Cases\',dirString));
 %% Load input data
-load(settings.dataFileName);
-totalLoad = [];
+PHORUMdata = LoadPHORUMFromCSV(settings,dirString);
+[PHORUMdata, EVdata] = MakeEVData(PHORUMdata,settings,2019,'2019',dirString);
 % Initialize all results structures
 [totalResults, prevDayResults] = InitializeResultsStruct(settings);
 
@@ -46,26 +32,31 @@ totalLoad = [];
 totalRuntime = 0;
 for rangeIndex = 1 : settings.numDateRanges
     for day = settings.dStart(rangeIndex) : 1: settings.dEnd(rangeIndex) - 1
-        
+
         % Status
         tic;
         disp(['Running GAMS, day: ', num2str(day)]);
         
         % Create GDX files
-        totalLoad=CreateGDX(day, PHORUMdata, settings, prevDayResults, optWindow,totalLoad);
+        CreateGDX(day, PHORUMdata, settings, prevDayResults, EVdata, dirString);
         % Run GAMS
-        system(settings.callGAMS);
+        cd(strcat(thisDir,'\Cases\',dirString));
+        gams(strcat(modelFile,' logoption=2'));
+        movefile(strcat(modelFile,'.log'),strcat('solver_logs\',modelFile,'_',string(day),'.log'));
+        delete('matdata.g*')
+        cd('..\..');
+        % [status,cmdout] = system(strcat(settings.callGAMS," ",pwd(),"\Models\",modelFile," workdir=",pwd(),"\Cases\",dirString),'-echo');
 
         % Parse daily results
-         [totalResults, prevDayResults] = ParseOutputs(totalResults, PHORUMdata, day, settings.dEnd(rangeIndex), optWindow, totalRuntime, tic);
-         
+        [totalResults, prevDayResults] = ParseOutputs(totalResults, PHORUMdata, day, settings.dEnd(rangeIndex), totalRuntime, tic, settings, EVdata, dirString);
+
     end
 end
+
 disp(['Saving results to ', settings.outputFileName, '...']);
 % Create all outputs as specified by settings
-outputs = SaveResults(totalResults, settings, PHORUMdata);
+outputs = SaveResults(totalResults, settings, PHORUMdata,dirString);
 
 
-save('totalLoad.mat','totalLoad')
 
 end
