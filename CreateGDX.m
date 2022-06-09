@@ -327,12 +327,12 @@ for n = 1:length(TCRs); AddLoadUnit(PHORUMdata.renewablesData,'windTCR',TCRs(n),
 for n = 1:length(TCRs); AddLoadUnit(PHORUMdata.renewablesData,'solarTCR',TCRs(n),tStart,tEnd); end
 
 % Assign imports to utility zones
-% for n = 1:length(importsAEP); AEP = AEP - eval(importsAEP(n)); end
-% for n = 1:length(importsCOMED); COMED = COMED - eval(importsCOMED(n)); end
-% for n = 1:length(importsDAY); DAY = DAY - eval(importsDAY(n)); end
-% for n = 1:length(importsDOM); DOM = DOM - eval(importsDOM(n)); end
-% for n = 1:length(importsPENELEC); PENELEC = PENELEC - eval(importsPENELEC(n)); end
-% for n = 1:length(importsPSEG); PSEG = PSEG - eval(importsPSEG(n)); end
+for n = 1:length(importsAEP); AEP = AEP - eval(importsAEP(n)); end
+for n = 1:length(importsCOMED); COMED = COMED - eval(importsCOMED(n)); end
+for n = 1:length(importsDAY); DAY = DAY - eval(importsDAY(n)); end
+for n = 1:length(importsDOM); DOM = DOM - eval(importsDOM(n)); end
+for n = 1:length(importsPENELEC); PENELEC = PENELEC - eval(importsPENELEC(n)); end
+for n = 1:length(importsPSEG); PSEG = PSEG - eval(importsPSEG(n)); end
 
 % Assign utility zones to TCRs
 loadTCR1 = zeros(settings.optWindow,1); loadTCR2 = loadTCR1; loadTCR3 = loadTCR1; loadTCR4 = loadTCR1; loadTCR5 = loadTCR1;
