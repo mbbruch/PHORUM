@@ -313,13 +313,13 @@ AEPAPT = 0; AEPIMP = 0; AEPKPT = 0; AEPOPT = 0;
 
 % Imports / exports
 importsAEP = ["ALTE","ALTW","CPLW","CWLP","DUK","IPL","LAGN","LGEE","MEC","MECS","NIPS","OVEC","SIGE","TVA","WEC"];
-importsCOMED = ["AMIL","MDU"];
+importsCE = ["AMIL","MDU"];
 importsDAY = ["CIN"];
 importsDOM = ["CPLE"];
 importsPENELEC = ["FE"];
 importsPSEG = ["HUDS","LIND","NEPT","NYIS"];
-importExportAreas = cat(2,importsAEP,importsCOMED,importsDAY,importsDOM,importsPENELEC,importsPSEG);
-for n = 1:length(importExportAreas); AddLoadUnit(loadData,'',importExportAreas(n),tStart,tEnd); end
+importExportAreas = cat(2,importsAEP,importsCE,importsDAY,importsDOM,importsPENELEC,importsPSEG);
+for n = 1:length(importExportAreas); AddLoadUnit(PHORUMdata.importData,'',importExportAreas(n),tStart,tEnd); end
 
 % Wind / solar
 TCRs = ["1","2","3","4","5"];
@@ -328,7 +328,7 @@ for n = 1:length(TCRs); AddLoadUnit(PHORUMdata.renewablesData,'solarTCR',TCRs(n)
 
 % Assign imports to utility zones
 for n = 1:length(importsAEP); AEP = AEP - eval(importsAEP(n)); end
-for n = 1:length(importsCOMED); COMED = COMED - eval(importsCOMED(n)); end
+for n = 1:length(importsCE); CE = CE - eval(importsCE(n)); end
 for n = 1:length(importsDAY); DAY = DAY - eval(importsDAY(n)); end
 for n = 1:length(importsDOM); DOM = DOM - eval(importsDOM(n)); end
 for n = 1:length(importsPENELEC); PENELEC = PENELEC - eval(importsPENELEC(n)); end
