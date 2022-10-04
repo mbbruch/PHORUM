@@ -48,6 +48,7 @@ importNEEDS <- function(modelingYear){
              plant.name = `Plant Name`,
              gen.id = `Unit ID`,
              PlantCode = UniqueID_Final,
+             online.year = `On Line Year`,
              fuel,
              detailed.type = PlantType,
              unit.type=`Boiler/Generator/Committed Unit`,

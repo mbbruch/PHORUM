@@ -21,6 +21,7 @@ derateHydro <- function(phorum_new, modelingYear){
      hydro_only <- hydro_only[,.(plant.id=min(plant.id,na.rm=TRUE),
                                  plant.name=paste0("Combined_Hydro_",TCR,"_",.N),
                                  gen.id="X",
+                                 online.year=min(online.year,na.rm=TRUE),
                                  fips=min(fips,na.rm=TRUE),
                                  fips2=min(fips,na.rm=TRUE),
                                  PlantCode=paste0(min(plant.id),"_",unit.type,"_","X"),

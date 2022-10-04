@@ -13,6 +13,7 @@ fuel_dir <<- paste0(base_dir,"fuel_prices\\")
 misc_dir <<- paste0(base_dir,"misc\\")
 county_dir <<- paste0(base_dir,"county_data\\")
 
+discount.rate <- 0.03 + 0.02 #3% discount rate, 2% inflation
 cpi.2010 <- 214.738
 cpi.2017 <- 245.120
 cpi.2019 <- 255.538
@@ -30,9 +31,13 @@ vsl <- 10.9 #$M, 2019, https://www.transportation.gov/office-policy/transportati
 mpg <- 24.89 #see average_vehicle_age.R
 mpg.greet <- 28
 Greet.ICE.MPG <- mpg.greet
-miles.greet <- 173151
-km.greet <- miles.greet/mi.per.km
+miles.greet.car <- 173151
+miles.greet.truck <- 183363
+km.greet.car <- miles.greet.car/mi.per.km
+km.greet.truck <- miles.greet.truck/mi.per.km
+fleet.avg.lifespan = 173151/10711.22 #=16.16539
 acs.to.pope2019 = -15.1 + 15.2*1.13 
-carbon.price <- 51 #Ward: triangular distro, 15-51-149 in 2019 USD (mean 71+2/3, median 64.11212) per tonne
+carbon.price <- 51 #185 #Ward: triangular distro, 15-51-149 in 2019 USD (mean 71+2/3, median 64.11212) per tonne
+co.cost <- 0*y10.to.y19
 model.year <- 2019
 suffix <- "2019"

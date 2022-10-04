@@ -1,10 +1,19 @@
 
-getPHORUMgendata <- function(year,runString){
-     coalSuffix <- str_extract(runString,"[0-9]{1,3}PctLessCoal")
+getPHORUMgendata <- function(year,runString,numGens){
+     coalSuffix <- substr(runString,
+                          str_locate(runString,"[0-9]{1,3}PctLessCoal")[1],
+                          str_length(runString))
      if(is.na(coalSuffix)){
           PHORUMdata <- fread(paste0(results_dir,"phorum_",year,".csv"))
      } else{
           PHORUMdata <- fread(paste0(results_dir,"phorum_",year,"_",coalSuffix,".csv"))
+     }
+     if(nrow(PHORUMdata) != numGens){
+          if(is.na(coalSuffix)){
+               PHORUMdata <- fread(paste0(results_dir,"phorum_",year,"_PUT.csv"))
+          } else{
+               PHORUMdata <- fread(paste0(results_dir,"phorum_",year,"_",coalSuffix,"_PUT.csv"))
+          }
      }
      PHORUMdata[,':='(
           nh3.md=MDNH3,
@@ -24,7 +33,7 @@ getPHORUMgendata <- function(year,runString){
 }
 
 fixup2010 <- function(){
-     damages <- fread(paste0(etl_dir,"county_data\\caces.damages.all.counties.csv"))
+     damages <- fread(paste0(base_dir,"county_data\\caces.damages.all.counties.csv"))
      phorum <- fread("C:\\Users\\Matthew\\Desktop\\PJM\\results_20220607\\phorum_2010_prelim.csv")
 
      phorum <- phorum[,.(
@@ -74,7 +83,7 @@ getPHORUMGridEmissions <- function(fullString) {
      if(str_count(runString,"_")>3) {
           detail <- substr(runString,str_locate(runString, "_Txn[0-1]")[2]+2,str_length(runString))
      }
-     thisPHORUMdata <- getPHORUMgendata(year,runString)
+     thisPHORUMdata <- getPHORUMgendata(year,runString,length(genMWh))
      thisPHORUMdata$genMWh <- genMWh
      out1 <- data.table(pollutant=c("nh3","so2","voc","nox","pm25","ghg","co"),
                         cost=c(thisPHORUMdata[,sum(genMWh*NH3*tonne.per.lb,na.rm=TRUE)],
@@ -98,7 +107,7 @@ getPHORUMGridEmissions <- function(fullString) {
      thisPHORUMdata[fuel_group=="Petroleum" & detailed.type=="Combustion Turbine" & gen.type.eia=="IC",type_for_upstream:="ICE"]
      thisPHORUMdata[fuel_group=="Petroleum" & detailed.type %like% "Steam",type_for_upstream:="Steam"]
      gen.by.fuel <- thisPHORUMdata[fuel_group!="Other",.(genMWh=sum(genMWh,na.rm=TRUE)),by=.(fuel_group,type_for_upstream)]
-     feedstock.emissions <- fread(paste0(etl_dir,"misc\\Greet_Grid_Upstream_Emissions_20220608.csv"))
+     feedstock.emissions <- fread(paste0(base_dir,"misc\\Greet_Grid_Upstream_Emissions_20220608.csv"))
      gen.by.fuel <- gen.by.fuel[feedstock.emissions,on=.(fuel_group=Fuel,type_for_upstream=Type)]
      out2 <- data.table(pollutant=c("nh3","so2","voc","nox","pm25","ghg","co"),
                         cost=c(gen.by.fuel[,sum(genMWh*0*tonne.per.lb,na.rm=TRUE)],
@@ -124,9 +133,9 @@ getPHORUMGridDamages <- function(fullString) {
      txn <- parse_number(substr(str_extract(runString, "_Txn[0-1]"),5,5))
      detail <- ""
      if(str_count(runString,"_")>3) {
-          detail <- word(runString,-1,sep="_")
+          detail <- substr(runString,str_locate(runString, "_Txn[0-1]")[2]+2,str_length(runString))
      }
-     thisPHORUMdata <- getPHORUMgendata(year,runString)
+     thisPHORUMdata <- getPHORUMgendata(year,runString,length(genMWh))
      thisPHORUMdata$genMWh <- genMWh
      out1 <- data.table(pollutant=c("nh3","so2","voc","nox","pm25","ghg","co"),
                         cost=c(thisPHORUMdata[,sum(genMWh*nh3.md,na.rm=TRUE)],
@@ -150,7 +159,7 @@ getPHORUMGridDamages <- function(fullString) {
      thisPHORUMdata[fuel_group=="Petroleum" & detailed.type=="Combustion Turbine" & gen.type.eia=="IC",type_for_upstream:="ICE"]
      thisPHORUMdata[fuel_group=="Petroleum" & detailed.type %like% "Steam",type_for_upstream:="Steam"]
      gen.by.fuel <- thisPHORUMdata[fuel_group!="Other",.(genMWh=sum(genMWh,na.rm=TRUE)),by=.(fuel_group,type_for_upstream)]
-     feedstock.emissions <- fread(paste0(etl_dir,"misc\\Greet_Grid_Upstream_Emissions_20220608.csv"))
+     feedstock.emissions <- fread(paste0(base_dir,"misc\\Greet_Grid_Upstream_Emissions_20220608.csv"))
      gen.by.fuel <- gen.by.fuel[feedstock.emissions,on=.(fuel_group=Fuel,type_for_upstream=Type)]
      feedstock.damages.oil <- getOilFeedstockDamages()
      feedstock.damages.gas <- getNatGasFeedstockDamages()
@@ -191,7 +200,7 @@ getPHORUMGridDamages <- function(fullString) {
 }
 
 getTotalMiles_Old <- function(){
-     driving.profiles <- fread(paste0(etl_dir,"vehicle_profiles\\vehicle_profile_details.csv"))
+     driving.profiles <- fread(paste0(base_dir,"vehicle_profiles\\vehicle_profile_details.csv"))
      total.cars.switched <- max(driving.profiles[,sum(cars),by=.(powertrain)]$V1)
      total.miles <- driving.profiles[,.(demand_miles_fleet=sum(demand_miles_fleet,na.rm=TRUE),
                                         combustion_miles_fleet=sum(combustion_miles_fleet,na.rm=TRUE),
@@ -200,14 +209,15 @@ getTotalMiles_Old <- function(){
      return(total.miles)
 }
 
-getDiscountRateMultiplier <- function(){
-     profiles <- fread(paste0(etl_dir,"vehicle_profiles\\vehicle_profile_details.csv"))
+getDiscountRateMultiplier <- function(type="car"){
+     profiles <- fread(paste0(base_dir,"vehicle_profiles\\vehicle_profile_details.csv"))
+     miles.to.use <- ifelse(type=="car",miles.greet.car,miles.greet.truck)
      profiles <- profiles[powertrain=="CV" & cars > 0,.(
           profile,
           cars,
           weight=cars/sum(cars),
           avmt=demand_miles_car,
-          lifespan=miles.greet/demand_miles_car)]
+          lifespan=miles.to.use/demand_miles_car)]
      profiles[,':='(
           full.years=floor(lifespan),
           part.year.fraction=lifespan-floor(lifespan)
@@ -224,8 +234,8 @@ getDiscountRateMultiplier <- function(){
 }
 
 getPJMCounties <- function(){
-     county_data <- fread(paste0(etl_dir,"county_data\\county_2019_populations.csv"))
-     needs <- fread(paste0(etl_dir,"generators\\needs_20201006.csv"))
+     county_data <- fread(paste0(base_dir,"county_data\\county_2019_populations.csv"))
+     needs <- fread(paste0(base_dir,"generators\\needs_20201006.csv"))
      region_fips <- needs[,.(units=.N),by=.(FIPS5,`Region Name`)
      ][,
        county_max_region:=max(units,na.rm=FALSE),by=.(FIPS5)
@@ -263,7 +273,7 @@ getTailpipeDamages <- function(specific.county=-1){
 }
 
 getManufactureDamages <- function(){
-     manufacture.counties <- fread(paste0(etl_dir,"county_data\\manufacture_counties.csv"))
+     manufacture.counties <- fread(paste0(base_dir,"county_data\\manufacture_counties.csv"))
      manufacture.counties <- manufacture.counties[caces.county,on=.(county=fips)]
      manufacture.counties[is.na(manufacture.counties)] <- 0
      manufacture.damages <- 
@@ -287,11 +297,12 @@ getOilFeedstockDamages <- function(){
      #components at atmospheric pressure by heating to temperatures of about 600º to 750º F 
      #(depending on the nature of the crude oil and desired products) and subsequent condensing 
      #of the fractions by cooling.
-     county_data <- fread(paste0(etl_dir,"county_data\\county_2019_populations.csv"))
-     sites <- fread(paste0(etl_dir,"county_data\\Petroleum_Refineries.csv"))
-     total.cap <- sum(sites$AD_Mbpd,na.rm=TRUE)
+     county_data <- fread(paste0(base_dir,"county_data\\county_2019_populations.csv"))
+     sites <- fread(paste0(base_dir,"county_data\\Petroleum_Refineries.csv"))
      index <- get.knnx(county_data[,.(INTPTLONG,INTPTLAT)],sites[,.(Longitude,Latitude)],1)$nn.index #TODO use lat-longs!
      sites$FIPS <- county_data[index,GEOID]
+     sites <- sites[FIPS %in% caces.county$fips]
+     total.cap <- sum(sites$AD_Mbpd,na.rm=TRUE)
      sites <- sites[,.(percent=sum(AD_Mbpd,na.rm=TRUE)/total.cap),by=FIPS][percent > 0]
      damages <- sites[caces.county,on=.(FIPS=fips),.(fips=fips,
                                                      damage.acs.stacklevel=damage.acs.stacklevel,
@@ -304,11 +315,12 @@ getOilFeedstockDamages <- function(){
      return(damages)
 }
 getNatGasFeedstockDamages <- function(){
-     county_data <- fread(paste0(etl_dir,"county_data\\county_2019_populations.csv"))
-     sites <- fread(paste0(etl_dir,"county_data\\Natural_Gas_Processing_Plants.csv"))
-     total.cap <- sum(sites$Plant_Flow,na.rm=TRUE)
+     county_data <- fread(paste0(base_dir,"county_data\\county_2019_populations.csv"))
+     sites <- fread(paste0(base_dir,"county_data\\Natural_Gas_Processing_Plants.csv"))
      index <- get.knnx(county_data[,.(INTPTLONG,INTPTLAT)],sites[,.(Longitude,Latitude)],1)$nn.index #TODO use lat-longs!
      sites$FIPS <- county_data[index,GEOID]
+     sites <- sites[FIPS %in% caces.county$fips]
+     total.cap <- sum(sites$Plant_Flow,na.rm=TRUE)
      sites <- sites[,.(percent=sum(Plant_Flow,na.rm=TRUE)/total.cap),by=FIPS][percent > 0]
      damages <- sites[caces.county,on=.(FIPS=fips),.(fips=fips,
                                                      damage.acs.stacklevel=damage.acs.stacklevel,
@@ -321,11 +333,12 @@ getNatGasFeedstockDamages <- function(){
      return(damages)
 }
 getCoalFeedstockDamages <- function(){
-     county_data <- fread(paste0(etl_dir,"county_data\\county_2019_populations.csv"))
-     sites <- fread(paste0(etl_dir,"county_data\\Coal_Mines.csv"))
+     county_data <- fread(paste0(base_dir,"county_data\\county_2019_populations.csv"))
+     sites <- fread(paste0(base_dir,"county_data\\Coal_Mines.csv"))
      sites[,capacity:=parse_number(tot_prod)]
-     total.cap <- sum(sites$capacity,na.rm=TRUE)
      sites[,FIPS:=mstafips*1000+mctyfips]
+     sites <- sites[FIPS %in% caces.county$fips]
+     total.cap <- sum(sites$capacity,na.rm=TRUE)
      sites <- sites[,.(percent=sum(capacity,na.rm=TRUE)/total.cap),by=FIPS][percent > 0]
      damages <- sites[caces.county,on=.(FIPS=fips),.(fips=fips,
                                                      damage.acs.stacklevel=damage.acs.stacklevel,
@@ -339,9 +352,12 @@ getCoalFeedstockDamages <- function(){
 }
 
 getManufactureEmissions <- function(vehType){
-     vehicle.emissions <- fread(paste0(etl_dir,"misc\\Greet_Vehicle_Emissions_20220615.csv"))
+     pickup <- ifelse(vehType %like% "_PUT","_PUT","")
+     vehicle.emissions <- fread(paste0(base_dir,"misc\\Greet_Vehicle_Emissions_20220629",pickup,".csv"))
      vehicle.emissions <- vehicle.emissions[!(Model %like% "BEV" | Model %like% "CD_Electric") | Stage!="Fuel"]
      vehTypeShort = word(vehType,1,sep="_")
+     if(vehTypeShort %like% "PHEV") vehTypeShort <- paste0(vehTypeShort,"_",phevChemistry)
+     if(vehTypeShort %like% "BEV") vehTypeShort <- paste0(vehTypeShort,"_",bevChemistry)
      temp <- vehicle.emissions[Model==vehTypeShort]
      veh <- data.table(vehType=vehType)
      veh[,':='(
@@ -403,11 +419,12 @@ getManufactureEmissions <- function(vehType){
 }
 getOperationsEmissions <- function(fullString,vehType){
      runString <- word(fullString,-1,sep=fixed("\\"))
-     plugin <- str_length(vehType)>3 #not 'HEV' or 'CV'
+     plugin <- str_length(word(vehType,1,sep="_"))>3 #not 'HEV' or 'CV'
+     pickupString <- ifelse(fullString %like% "_PUT","_PUT","")
      if(plugin){ 
           evDataString <- paste0(fullString,"\\EVdata_",vehType,"_2019.mat")
      } else{
-          defaultVeh <- "BEV300_2021GREET"
+          defaultVeh <- paste0("BEV300_2021GREET",pickupString)
           evDataString <- paste0(gsub(runString,"",fullString),defaultVeh,"_CC0_2019_Txn1\\EVdata_",defaultVeh,"_2019.mat")
      }
      EVdata <- readMat(evDataString)[[1]]
@@ -421,7 +438,7 @@ getOperationsEmissions <- function(fullString,vehType){
           miles.battery <- 0.0
      }
      total.miles <- miles.battery+miles.gas
-     vehicle.emissions <- fread(paste0(etl_dir,"misc\\Greet_Vehicle_Emissions_20220615.csv"))
+     vehicle.emissions <- fread(paste0(base_dir,"misc\\Greet_Vehicle_Emissions_20220629",pickupString,".csv"))
      vehicle.emissions <- vehicle.emissions[!(Model %like% "BEV" | Model %like% "CD_Electric") | Stage!="Fuel"]
      vehTypeShort = word(vehType,1,sep="_")
      temp <- vehicle.emissions[Model==vehTypeShort]
@@ -506,7 +523,7 @@ getGREETEmissionsTailpipe <- function(specific.county,fullString,operations.emis
      txn <- parse_number(substr(str_extract(runString, "_Txn[0-1]"),5,5))
      detail <- ""
      if(str_count(runString2,"_")>3) {
-          detail <- word(runString2,-1,sep="_")
+          detail <- substr(runString,str_locate(runString, "_Txn[0-1]")[2]+2,str_length(runString))
      }
      
      tailpipe.damages <- getTailpipeDamages(specific.county)
@@ -532,7 +549,7 @@ getGREETDamagesTailpipe <- function(specific.county,fullString,operations.emissi
      txn <- parse_number(substr(str_extract(runString, "_Txn[0-1]"),5,5))
      detail <- ""
      if(str_count(runString2,"_")>3) {
-          detail <- word(runString2,-1,sep="_")
+          detail <- substr(runString,str_locate(runString, "_Txn[0-1]")[2]+2,str_length(runString))
      }
      
      tailpipe.damages <- getTailpipeDamages(specific.county)
@@ -557,7 +574,7 @@ getGREETEmissionsExceptTailpipe <- function(fullString,operations.emissions,spec
      txn <- parse_number(substr(str_extract(runString, "_Txn[0-1]"),5,5))
      detail <- ""
      if(str_count(runString2,"_")>3) {
-          detail <- word(runString2,-1,sep="_")
+          detail <- substr(runString,str_locate(runString, "_Txn[0-1]")[2]+2,str_length(runString))
      }
      
      
@@ -641,10 +658,9 @@ getGREETDamagesExceptTailpipe <- function(fullString,operations.emissions,specif
      txn <- parse_number(substr(str_extract(runString, "_Txn[0-1]"),5,5))
      detail <- ""
      if(str_count(runString2,"_")>3) {
-          detail <- word(runString2,-1,sep="_")
+          detail <- substr(runString,str_locate(runString, "_Txn[0-1]")[2]+2,str_length(runString))
      }
 
-     
      manufacture.emissions <- getManufactureEmissions(vehType)
      manufacture.damages <- getManufactureDamages()
      refining.damages <- getOilFeedstockDamages()
@@ -716,7 +732,652 @@ getGREETDamagesExceptTailpipe <- function(fullString,operations.emissions,specif
      return(out[,.(year=year,cc=cc,veh=vehType,txn=txn,detail=detail,stage=stage,pollutant,cost)])
 }
 
-plotEvolution <- function(damages){
+plotSensitivities <- function(){
+     phevChemistry <<- "NMC111"
+     bevChemistry <<- "NMC622"
+     damages <- getAllDamages()   
+     hev <- damages[Year %in% c("2019") & 
+                         Powertrain %in% c("HEV") & 
+                         stage %in% c("operations","upstream_gasoline"),
+                    .(Costs=sum(cost)),
+                    by=.(Powertrain,Year)]
+     rollup1 <- damages[!(Year=="2010" & Powertrain %like% "CC"),
+                        .(Costs=sum(cost)),
+                        by=.(Powertrain,Year)]
+     baseline.grid.damages <- damages[Powertrain %like% "ICEV" & stage %in% c("grid","upstream_grid"),.(bau_grid_cost=sum(cost)),by=Year]
+     rollup1[baseline.grid.damages,Costs:=Costs-bau_grid_cost,on=.(Year)]
+     rollup1[,NumericYear:=as.numeric(substr(Year,1,4))] 
+     
+     phevChemistry <<- "LFP"
+     bevChemistry <<- "LFP"
+     damages <- getAllDamages()
+     rollup2 <- damages[!(Year=="2010" & Powertrain %like% "CC"),.(Costs=sum(cost)),by=.(Powertrain,Year)]
+     baseline.grid.damages <- damages[Powertrain %like% "ICEV" & stage %in% c("grid","upstream_grid"),.(bau_grid_cost=sum(cost)),by=Year]
+     rollup2[baseline.grid.damages,Costs:=Costs-bau_grid_cost,on=.(Year)]
+     rollup2[,NumericYear:=as.numeric(substr(Year,1,4))]  
+     
+     phevChemistry <<- "NMC111"
+     bevChemistry <<- "NMC811"
+     damages <- getAllDamages()
+     rollup3 <- damages[!(Year=="2010" & Powertrain %like% "CC"),.(Costs=sum(cost)),by=.(Powertrain,Year)]
+     baseline.grid.damages <- damages[Powertrain %like% "ICEV" & stage %in% c("grid","upstream_grid"),.(bau_grid_cost=sum(cost)),by=Year]
+     rollup3[baseline.grid.damages,Costs:=Costs-bau_grid_cost,on=.(Year)]
+     rollup3[,NumericYear:=as.numeric(substr(Year,1,4))] 
+     
+     rollup1[Powertrain %like% "PHEV",Chemistry:="NMC111"]
+     rollup1[Powertrain %like% "BEV",Chemistry:="NMC622"]
+     rollup2[Powertrain %like% "PHEV",Chemistry:="LFP"]
+     rollup2[Powertrain %like% "BEV",Chemistry:="LFP"]
+     rollup3[Powertrain %like% "PHEV",Chemistry:="NMC111"]
+     rollup3[Powertrain %like% "BEV",Chemistry:="NMC811"]
+     rollup3 <- rollup3[Powertrain %like% "BEV"]
+     hev.cost <- rollup1[Powertrain=="HEV",min(Costs)]
+     icev.cost <- rollup1[Powertrain=="ICEV",min(Costs)]
+     all <- rbindlist(list(rollup1,rollup2,rollup3))
+     all[(Powertrain %like% "BEV" & Chemistry=="NMC622") | 
+              (Powertrain %like% "PHEV" & Chemistry=="NMC111"),
+         base.case:=TRUE]
+#     all[Powertrain=="BEV300-CC",Powertrain:="BEV-CC"]
+#     all[Powertrain=="BEV300-UC",Powertrain:="BEV-UC"]
+#     all[Powertrain=="PHEV20-CC",Powertrain:="PHEV-CC"]
+#     all[Powertrain=="PHEV20-UC",Powertrain:="PHEV-UC"]
+#     all$Powertrain <- fct_relevel(all$Powertrain, c("BEV-CC","BEV-UC","PHEV-CC","PHEV-UC"))
+     
+     all[Powertrain=="BEV-CC",Powertrain:="BEV300-CC"]
+     all[Powertrain=="BEV-UC",Powertrain:="BEV300-UC"]
+     all[Powertrain=="PHEV-CC",Powertrain:="PHEV20-CC"]
+     all[Powertrain=="PHEV-UC",Powertrain:="PHEV20-UC"]
+     all$Powertrain <- fct_relevel(all$Powertrain, c("BEV300-CC","BEV300-UC","PHEV20-CC","PHEV20-UC"))
+
+     all <- all[Year != "2010"]
+     all[,Case:=""][,YearRank:=1]
+     all[Year %in% c("2019","2025","2035"),':='(
+          Case="Base Case",YearRank=1)]
+     all[Year %like% "10PctRE",':='(Case="10% RE",
+                                    YearRank=10)]
+     all[Year %like% "22PctRE",':='(Case="22% RE",
+                                    YearRank=20)]
+     all[Year %like% "RE" & Year %like% "25PctLessCoal",
+         ':='(Case=paste0(Case,", Coal ",sprintf('\u2193'),"25%"),
+              YearRank=YearRank+1)]
+     all[Year %like% "RE" & Year %like% "50PctLessCoal",
+         ':='(Case=paste0(Case,", Coal ",sprintf('\u2193'),"50%"),
+         YearRank=YearRank+2)]
+     all[(!(Year %like% "RE")) & Year %like% "25PctLessCoal",
+         ':='(Case=paste0(Case,"Coal ",sprintf('\u2193'),"25%"),
+              YearRank=YearRank+1)]
+     all[(!(Year %like% "RE")) & Year %like% "50PctLessCoal",
+         ':='(Case=paste0(Case,"Coal ",sprintf('\u2193'),"50%"),
+              YearRank=YearRank+2)]
+     all[Year %like% "MoreNG",
+         ':='(Case=paste0(Case,", Nat Gas ",sprintf('\u2191')),
+              YearRank=YearRank+2)]
+     all$Case <- fct_reorder(all$Case,-all$YearRank)
+     all <- all[Powertrain %like% "BEV" | Powertrain %like% "PHEV"]
+     all$newX <- as.numeric(as.factor(all$Case))
+     all[,xOffset:=frank(-as.numeric(as.factor(Case)),ties.method="dense"),by=NumericYear][,xOffset:=uniqueN(Case)-xOffset+1,by=NumericYear]
+     all[,':='(min=min(Costs,na.rm=TRUE),max=max(Costs,na.rm=TRUE)),
+         by=.(NumericYear,Case,Powertrain)]
+     base <- all[(Powertrain %like% "BEV" | Powertrain %like% "PHEV") & base.case]
+     base$Chemistry <- NULL
+    
+     base[Case=="10% RE",Case:="Base Case (10% RE)"]
+     font_add("arial", "arial.ttf")
+     barWidthTotal = 0.75
+     showtext_auto()
+     thisPlot <- ggplot(data=base,aes(x=Case,y=Costs-hev.cost,group=Powertrain,fill=Powertrain, ymin = min-hev.cost, ymax = max-hev.cost))+
+          geom_col(width=barWidthTotal,position="dodge") +
+          geom_pointrange(alpha=0.75,size=0.25, fatten=0.5, show.legend=FALSE, mapping = aes(
+               x = xOffset-barWidthTotal/2+barWidthTotal/4/2+(as.numeric(as.factor(Powertrain))-1)*barWidthTotal/4)) +
+          # geom_point(aes(x=xOffset-barWidthTotal/2+barWidthTotal/4/2+(as.numeric(as.factor(Powertrain))-1)*barWidthTotal/4,group=Powertrain,shape=Chemistry)) +
+          xlab("Powertrain") + ylab("Life cycle air emissions externalities relative to HEV ($/car)") +
+          scale_y_continuous(labels=scales::dollar_format(), limits=c(-2000,2000), position="right",expand=c(0,0)) + 
+          #        scale_shape_manual(values=c(15,4,3,16)) +
+          scale_fill_manual(values = getFourColors(),name="",guide=guide_legend(reverse=TRUE)) + 
+          theme_light() + 
+          theme(legend.position="bottom",
+                legend.title = element_text(size = 0),
+                legend.text = element_text(size = 8),
+                legend.spacing.x = unit(0.125, 'cm'),
+                strip.text = element_text(size = 10),
+                axis.text = element_text(size=8,family="arial"),
+                axis.title = element_text(size=11),
+                axis.title.y = element_blank(), 
+                plot.margin = unit(c(0,0,0,0), "cm")) +
+          coord_flip()  +
+          geom_hline(aes(yintercept=icev.cost-hev.cost,linetype="ICEV")) +
+          scale_linetype_manual(values="dashed",name="") +
+          facet_grid(NumericYear ~ .,scales="free_y",space="free")
+     thisPlot
+     ggsave(plot=thisPlot,paste0(results_dir,"Sensitivity.pdf"), width=6.5, height=6.0,units="in")
+     showtext_auto(FALSE)
+     
+     
+     base <- base[Case %like% "Base"]
+     base[Case=="Base Case (10% RE)",Case:="Base Case"]
+     base <- rbindlist(list(copy(base),
+                            base[,':='(
+                                 Costs=Costs+hev$Costs,
+                                 min=min+hev$Costs,
+                                 max=max+hev$Costs,
+                                 Case="CAFE Leakage"
+                            )]))
+     base[Case %like% "CAFE Leakage",Case:="Policy Interaction"]
+     
+     showtext_auto()
+     thisPlot <- ggplot(data=base,aes(x=Case,y=Costs-hev.cost,group=Powertrain,fill=Powertrain, ymin = min-hev.cost, ymax = max-hev.cost))+
+          geom_col(width=barWidthTotal,position="dodge") +
+          geom_pointrange(alpha=0.75,size=0.6, fatten=1.2, show.legend=FALSE, mapping = aes(
+              x = ifelse(base$Case %like% "Policy",1,2)-barWidthTotal/2+barWidthTotal/4/2+(as.numeric(as.factor(Powertrain))-1)*barWidthTotal/4)) +
+         # geom_point(aes(x=xOffset-barWidthTotal/2+barWidthTotal/4/2+(as.numeric(as.factor(Powertrain))-1)*barWidthTotal/4,group=Powertrain,shape=Chemistry)) +
+          xlab("Powertrain") + ylab("Life cycle air emissions externalities relative to HEV ($/car)") +
+         scale_y_continuous(labels=scales::dollar_format(), limits=c(-2000,6000), position="right",expand=c(0,0)) + 
+         scale_x_discrete(limits=rev) +
+         scale_fill_manual(values = getFourColors(),name="",guide=guide_legend(reverse=TRUE)) + 
+          theme_light() + 
+          theme(legend.position="bottom",
+                legend.title = element_text(size = 0),
+                legend.text = element_text(size = 8),
+                legend.spacing.x = unit(0.125, 'cm'),
+                strip.text = element_text(size = 10),
+                axis.text = element_text(size=8,family="arial"),
+                axis.title = element_text(size=11),
+                axis.title.y = element_blank(), 
+                plot.margin = unit(c(0,0,0,0), "cm")) +
+          coord_flip()  +
+          geom_hline(aes(yintercept=icev.cost-hev.cost,linetype="ICEV")) +
+          scale_linetype_manual(values="dashed",name="") +
+          facet_grid(NumericYear ~ .,scales="free_y",space="free")
+     thisPlot
+     ggsave(plot=thisPlot,paste0(results_dir,"CAFE Leakage.pdf"), width=6.5, height=6.0,units="in")
+     showtext_auto(FALSE)
+}
+
+plotEvolution <- function(){
+     phevChemistry <<- "NMC111"
+     bevChemistry <<- "NMC622"
+     damages <- getAllDamages()
+     rollup1 <- damages[!(Year=="2010" & Powertrain %like% "CC"),.(Costs=sum(cost)),by=.(Powertrain,Year)]
+     baseline.grid.damages <- damages[Powertrain %like% "ICEV" & stage %in% c("grid","upstream_grid"),.(bau_grid_cost=sum(cost)),by=Year]
+     rollup1[baseline.grid.damages,Costs:=Costs-bau_grid_cost,on=.(Year)]
+     rollup1[,NumericYear:=as.numeric(substr(Year,1,4))]    
+     base <- rollup1[!(Powertrain %like% "CC") & !(Year %like% "LessCoal")  & !(Year %like% "22PctRE")]
+     base[,Powertrain:=gsub("-[C,U]C","",Powertrain)]
+     
+     phevChemistry <<- "LFP"
+     bevChemistry <<- "LFP"
+     damages <- getAllDamages()
+     rollup2 <- damages[!(Year=="2010" & Powertrain %like% "CC"),.(Costs=sum(cost)),by=.(Powertrain,Year)]
+     baseline.grid.damages <- damages[Powertrain %like% "ICEV" & stage %in% c("grid","upstream_grid"),.(bau_grid_cost=sum(cost)),by=Year]
+     rollup2[baseline.grid.damages,Costs:=Costs-bau_grid_cost,on=.(Year)]
+     rollup2[,NumericYear:=as.numeric(substr(Year,1,4))]  
+     rollup2 <- rollup2[Powertrain %like% "BEV"]
+     
+     phevChemistry <<- "NMC111"
+     bevChemistry <<- "NMC811"
+     damages <- getAllDamages()
+     rollup3 <- damages[!(Year=="2010" & Powertrain %like% "CC"),.(Costs=sum(cost)),by=.(Powertrain,Year)]
+     baseline.grid.damages <- damages[Powertrain %like% "ICEV" & stage %in% c("grid","upstream_grid"),.(bau_grid_cost=sum(cost)),by=Year]
+     rollup3[baseline.grid.damages,Costs:=Costs-bau_grid_cost,on=.(Year)]
+     rollup3[,NumericYear:=as.numeric(substr(Year,1,4))]  
+     rollup3 <- rollup3[Powertrain %like% "BEV"]
+     
+     rollup <- rbindlist(list(rollup1[,Chemistry:="NMC_Low_Nickel"],
+                              rollup2[,Chemistry:="LFP"],
+                              rollup3[,Chemistry:="NMC_High_Nickel"]))
+     rollup[Chemistry %like% "NMC" & Powertrain %like% "PHEV",Chemistry:="NMC111"]
+     rollup[Chemistry %like% "NMC_Low" & Powertrain %like% "BEV",Chemistry:="NMC622"]
+     rollup[Chemistry %like% "NMC_High" & Powertrain %like% "BEV",Chemistry:="NMC811"]
+     rollup[Powertrain %in% c("ICEV","HEV"),Chemistry:=as.character(NA)]
+     rollup[Powertrain %like% "UC", Controlled:=FALSE]
+     rollup[Powertrain %like% "CC", Controlled:=TRUE]
+     rollup[,Powertrain:=gsub("-[C,U]C","",Powertrain)]
+     
+     
+     rollup[Year %like% "10PctRE",':='(RE="10% RE")]
+     rollup[Year %like% "22PctRE",':='(RE="22% RE")]
+     rollup[Year %like% "25PctLessCoal",':='(Coal="25% Less Coal")]
+     rollup[Year %like% "50PctLessCoal",':='(Coal="50% Less Coal")]
+     rollup[Year %like% "MoreNG",':='(NG="More CCNG")]
+     rollup <- rollup[NumericYear==2035 | str_length(Year)==4]
+     rollup[,':='(min=min(Costs,na.rm=TRUE),
+                  max=max(Costs,na.rm=TRUE)),
+            by=.(Powertrain,NumericYear)]
+     
+     old <- copy(rollup)
+     base <- rollup[(is.na(Controlled) | Controlled==0) & 
+                         !(Year %like% "LessCoal")  & 
+                         !(Year %like% "22PctRE") &
+                         !(Powertrain %like% "BEV" & Chemistry!="NMC622") &
+                         !(Powertrain %like% "PHEV" & Chemistry!="NMC111")]
+     
+     saveRDS(rollup,paste0(results_dir,"temp_rollup.RDS"))
+     
+     minY <- min(min(base$Costs),min(base$min,na.rm=TRUE))-100
+     maxY <- max(max(base$Costs),max(base$max,na.rm=TRUE))+300
+     #base[Powertrain %like% "0" & NumericYear==2010,max:=maxY]
+     base[Powertrain=="HEV",nudgeX:=-0.5]
+     base[Powertrain=="ICEV",nudgeX:=-0.5]
+     base[Powertrain=="PHEV20",nudgeX:=-2]
+     base[Powertrain=="BEV300",nudgeX:=-2.2]
+     mins <- rollup[NumericYear==2035 & Costs==min & !(Powertrain %in% c("ICEV","HEV"))]
+     maxs <- rollup[NumericYear==2035 & Costs==max & !(Powertrain %in% c("ICEV","HEV"))]
+     
+     baseForLines <- base[!(Powertrain %in% c("ICEV","HEV")) & NumericYear==2025]
+     baseForLines[,':='(nudgeX=NULL,minString=NULL,maxString=NULL)]
+     rollup[,baseChemistry:= (Powertrain %like% "BEV" & Chemistry %like% "622") | 
+                 (Powertrain %like% "PHEV" & Chemistry %like% "111")]
+     caseCC <- rollup[NumericYear==2035 & !(Powertrain %in% c("ICEV","HEV")) & 
+                             baseChemistry & Controlled &
+                             RE=="10% RE" & is.na(Coal)]
+     case22RE <- rollup[NumericYear==2035 & !(Powertrain %in% c("ICEV","HEV")) & 
+                             baseChemistry & !Controlled &
+                             RE=="22% RE" & is.na(Coal)]
+     caseCoalRet <- rollup[NumericYear==2035 & !(Powertrain %in% c("ICEV","HEV")) & 
+                             baseChemistry & !Controlled &
+                             RE=="10% RE" & Coal=="50% Less Coal" & is.na(NG)]
+     caseCoalRep <- rollup[NumericYear==2035 & !(Powertrain %in% c("ICEV","HEV")) & 
+                                baseChemistry & !Controlled &
+                                RE=="10% RE" & Coal=="50% Less Coal" & !is.na(NG)]
+     caseLFP<- rollup[NumericYear==2035 & !(Powertrain %in% c("ICEV","HEV")) & 
+                                Chemistry=="LFP" & !Controlled &
+                                RE=="10% RE" & is.na(Coal) & is.na(NG)]
+     caseNMC811 <- rollup[NumericYear==2035 & !(Powertrain %in% c("ICEV","HEV")) & 
+                                Chemistry=="NMC811" & !Controlled &
+                                RE=="10% RE" & is.na(Coal) & is.na(NG)]
+     caseCC <- rbindlist(list(caseCC[,baseChemistry:=NULL],baseForLines),use.names=TRUE,fill=TRUE)[,':='(text="controlled charging")]
+     case22RE <- rbindlist(list(case22RE[,baseChemistry:=NULL],baseForLines),use.names=TRUE,fill=TRUE)[,':='(text="22% RE")]
+     caseCoalRet <- rbindlist(list(caseCoalRet[,baseChemistry:=NULL],baseForLines),use.names=TRUE,fill=TRUE)[,':='(text="50% coal retired")]
+     caseCoalRep <- rbindlist(list(caseCoalRep[,baseChemistry:=NULL],baseForLines),use.names=TRUE,fill=TRUE)[,':='(text="50% coal retired w/CCNG replacement")]
+     caseLFP <- rbindlist(list(caseLFP[,baseChemistry:=NULL],baseForLines),use.names=TRUE,fill=TRUE)[,':='(text="LFP chemistry")]
+     caseNMC811 <- rbindlist(list(caseNMC811[,baseChemistry:=NULL],baseForLines[Powertrain %like% "BEV"]),use.names=TRUE,fill=TRUE)[,':='(text="NMC811 chemistry")]
+     mins[,text:=paste0(Chemistry," chemistry + ",
+                        fifelse(Controlled,"controlled charging","uncontrolled charging"),
+                        fifelse(RE!="10% RE",paste0(" + ",RE),""),
+                        fifelse(is.na(Coal),"",paste0(" +\n",gsub("Less Coal","coal retired",Coal))),
+                        fifelse(is.na(NG),"",paste0(" ",gsub("More CCNG","w/CCNG replacement",NG))))]
+     maxs[,text:=paste0(Chemistry," chemistry + ",
+                        fifelse(Controlled,"controlled charging","uncontrolled charging"),
+                        fifelse(RE!="10% RE",paste0(" + ",RE),""),
+                        fifelse(is.na(Coal),"",paste0(" +\n",gsub("Less Coal","coal retired",Coal))),
+                        fifelse(is.na(NG),"",paste0(" ",gsub("More CCNG","w/CCNG replacement",NG))))]
+     base[mins,minString:=text,on=.(Powertrain)]
+     base[maxs,maxString:=text,on=.(Powertrain)]
+     upperLine <- base[NumericYear>=2025 & Powertrain %in% c("BEV300","PHEV20")]
+     lowerLine <- base[NumericYear>=2025 & Powertrain %in% c("BEV300","PHEV20")]
+     upperLine[NumericYear==2035,Costs:=max]
+     lowerLine[NumericYear==2035,Costs:=min]
+     baseToPlot <- base #[NumericYear != 2035 | Powertrain %in% c("HEV","ICEV")]
+     base[NumericYear<2035,':='(min=Costs,max=Costs)]
+     lowerLine[,':='(text=minString)][,':='(nudgeX=NULL,minString=NULL,maxString=NULL)]
+     upperLine[,':='(text=maxString)][,':='(nudgeX=NULL,minString=NULL,maxString=NULL)]
+     cases <- rbindlist(list(
+          upperLine, lowerLine,
+          caseCC,case22RE,caseCoalRet,caseCoalRep,caseLFP,caseNMC811
+     ))
+     cases[,text:=paste0("Base + ",text)]
+     labels <- rbindlist(list(cases[!Powertrain %like% "PHEV" & NumericYear==2035],
+                    base[Powertrain=="BEV300" & NumericYear==2035][,text:="Base case"]),use.names=TRUE,fill=TRUE)
+     
+     ggplot(base[!Powertrain %like% "PHEV"], aes(x = NumericYear, 
+                      y = Costs, 
+                      group = Powertrain, 
+                      col = Powertrain)) +           # Draw line plot with ggplot2
+          geom_line(data=baseToPlot[!Powertrain %like% "PHEV"],linetype = "solid",size=1.0, alpha=1.0) + 
+          geom_line(data=cases[!Powertrain %like% "PHEV"],
+                    aes(x = NumericYear,
+                        y = Costs,
+                        group = paste0(Powertrain,"_",text),
+                        col = Powertrain),
+                    linetype = "solid",size=0.5, alpha=0.3) +
+          geom_ribbon(aes(ymin=min,ymax=max,fill=Powertrain,color=NA),alpha=0.2) +
+          scale_y_continuous(labels=scales::dollar_format(), 
+                             limits=c(minY,maxY),
+                             #breaks=seq(0,10000,2000), 
+                             #minor_breaks = seq(0, 10000, 1000),
+                             position="left",
+                             expand = c(0,0)) + 
+          xlab("PJM Generator Fleet Scenario Year") +
+          ylab("Life cycle air emissions externalities ($/car)") +
+          scale_x_continuous(limits=c(2005.5,2035),breaks=c(2010,2019,2025,2035)) +
+          coord_cartesian(clip="off") +
+          theme_light() + 
+          scale_color_brewer(palette = "Dark2") + 
+          scale_fill_brewer(palette = "Dark2") + 
+          theme(legend.position="none",
+                legend.title = element_text(size = 11),
+                legend.text = element_text(size = 11),
+                strip.text = element_text(size = 11),
+                axis.text = element_text(size=11),
+                axis.title = element_text(size=11),
+                panel.grid.major.x = element_blank() ,
+                panel.grid.minor.x = element_blank() ,
+                # explicitly set the horizontal lines (or they will disappear too)
+                panel.grid.major.y = element_line( size=.075, color="grey90" ),
+                panel.grid.minor.y = element_line( size=.075, color="grey90" ),
+                plot.margin = unit(c(0.1, 7.5, 0.1, 0.1), "cm"),
+                panel.border = element_blank())+
+          geom_text_repel(aes(label = ifelse(NumericYear==2010,Powertrain,"")),
+                          nudge_x = base[!Powertrain %like% "PHEV"]$nudgeX,
+                          size=2.9,
+                          na.rm = TRUE,
+                          segment.linetype="blank",
+                          xlim = c(-Inf, Inf), ylim = c(-Inf, Inf)) +
+          geom_text_repel(data=labels,
+                          aes(label = ifelse(NumericYear==2035 & Powertrain %in% c("BEV300","PHEV20"),text,""),
+                              y = Costs),
+                          nudge_x = ifelse(labels$Costs>8000 | labels$Costs<6000,1,2.5),
+                          size=2.7,
+                          color="black",
+                          hjust=0,
+                          #nudge_y=100,
+                          na.rm = TRUE,
+                          direction="y",
+                          segment.size = 0.2,
+                          #segment.linetype="blank",
+                          xlim = c(2035, Inf), ylim = c(lowerLine[NumericYear==2035 & !Powertrain %like% "PHEV",min(Costs)], upperLine[NumericYear==2035 & !Powertrain %like% "PHEV",max(Costs)]))
+     ggsave(paste0(results_dir,"TimeSeries_Pathways_Labeled_BEV.pdf"), width=6.5, height=4.0,units="in")
+ 
+     phevPlotColors <-  RColorBrewer::brewer.pal(5,'Dark2')
+     phevPlotColors <- phevPlotColors[c(2,3,4)]
+     labels <- rbindlist(list(cases[!Powertrain %like% "BEV" & NumericYear==2035],
+                              base[Powertrain=="PHEV20" & NumericYear==2035][,text:="Base case"]),use.names=TRUE,fill=TRUE)
+     labels$text <- gsub(" \\+ NMC111 chemistry","",labels$text)
+     ggplot(base[!Powertrain %like% "BEV"], aes(x = NumericYear, 
+                                                 y = Costs, 
+                                                 group = Powertrain, 
+                                                 col = Powertrain)) +           # Draw line plot with ggplot2
+          geom_line(data=baseToPlot[!Powertrain %like% "BEV"],linetype = "solid",size=1.0, alpha=1.0) + 
+          geom_line(data=cases[!Powertrain %like% "BEV"],
+                    aes(x = NumericYear,
+                        y = Costs,
+                        group = paste0(Powertrain,"_",text),
+                        col = Powertrain),
+                    linetype = "solid",size=0.5, alpha=0.3) +
+          geom_ribbon(aes(ymin=min,ymax=max,fill=Powertrain,color=NA),alpha=0.2) +
+          scale_y_continuous(labels=scales::dollar_format(), 
+                             limits=c(minY,maxY),
+                             #breaks=seq(0,10000,2000), 
+                             #minor_breaks = seq(0, 10000, 1000),
+                             position="left",
+                             expand = c(0,0)) + 
+          xlab("PJM Generator Fleet Scenario Year") +
+          ylab("Life cycle air emissions externalities ($/car)") +
+          scale_x_continuous(limits=c(2005.5,2035),breaks=c(2010,2019,2025,2035)) +
+          coord_cartesian(clip="off") +
+          theme_light() + 
+          scale_color_manual(values = phevPlotColors) +
+          scale_fill_manual(values = phevPlotColors) +
+          theme(legend.position="none",
+                legend.title = element_text(size = 11),
+                legend.text = element_text(size = 11),
+                strip.text = element_text(size = 11),
+                axis.text = element_text(size=11),
+                axis.title = element_text(size=11),
+                panel.grid.major.x = element_blank() ,
+                panel.grid.minor.x = element_blank() ,
+                # explicitly set the horizontal lines (or they will disappear too)
+                panel.grid.major.y = element_line( size=.075, color="grey90" ),
+                panel.grid.minor.y = element_line( size=.075, color="grey90" ),
+                plot.margin = unit(c(0.1, 7.5, 0.1, 0.1), "cm"),
+                panel.border = element_blank())+
+          geom_text_repel(aes(label = ifelse(NumericYear==2010,Powertrain,"")),
+                          nudge_x = base[!Powertrain %like% "BEV"]$nudgeX,
+                          size=2.9,
+                          na.rm = TRUE,
+                          segment.linetype="blank",
+                          xlim = c(-Inf, Inf), ylim = c(-Inf, Inf)) +
+          geom_text_repel(data=labels,
+                          aes(label = ifelse(NumericYear==2035 & Powertrain %in% c("BEV300","PHEV20"),text,""),
+                              y = Costs),
+                          color="black",
+                          nudge_x = ifelse(labels$Costs>8000 | labels$Costs<6000,1,2.5),
+                          size=2.7,
+                          hjust=0,
+                          #nudge_y=100,
+                          na.rm = TRUE,
+                          direction="y",
+                          segment.size = 0.2,
+                          #segment.linetype="blank",
+                          xlim = c(2035, Inf), ylim = c(lowerLine[NumericYear==2035 & !Powertrain %like% "PHEV",min(Costs)], upperLine[NumericYear==2035 & !Powertrain %like% "PHEV",max(Costs)]))
+     ggsave(paste0(results_dir,"TimeSeries_Pathways_Labeled_PHEV.pdf"), width=6.5, height=4.0,units="in")
+     
+     
+     ggplot(base, aes(x = NumericYear, 
+                      y = Costs, 
+                      group = Powertrain, 
+                      col = Powertrain)) +           # Draw line plot with ggplot2
+          geom_line(linetype = "solid",size=1.0, alpha=1.0) + 
+          geom_ribbon(aes(ymin=min,ymax=max,fill=Powertrain,color=NA),alpha=0.2) +
+          scale_y_continuous(labels=scales::dollar_format(), 
+                             limits=c(minY,maxY),
+                             #breaks=seq(0,10000,2000), 
+                             #minor_breaks = seq(0, 10000, 1000),
+                             position="left",
+                             expand = c(0,0)) + 
+          xlab("PJM Generator Fleet Scenario Year") +
+          ylab("Life cycle air emissions externalities ($/car)") +
+          scale_x_continuous(limits=c(2005,2035.1),breaks=c(2010,2019,2025,2035)) +
+          coord_cartesian(clip="off") +
+          theme_light() + 
+          scale_color_brewer(palette = "Dark2") + 
+          scale_fill_brewer(palette = "Dark2") + 
+          theme(legend.position="none",
+                legend.title = element_text(size = 11),
+                legend.text = element_text(size = 11),
+                strip.text = element_text(size = 11),
+                axis.text = element_text(size=11),
+                axis.title = element_text(size=11),
+                panel.grid.major.x = element_blank() ,
+                panel.grid.minor.x = element_blank() ,
+                # explicitly set the horizontal lines (or they will disappear too)
+                panel.grid.major.y = element_line( size=.075, color="grey90" ),
+                panel.grid.minor.y = element_line( size=.075, color="grey90" ),
+                plot.margin = unit(c(0.1, 5, 0.1, 0.1), "cm"),
+                panel.border = element_blank())+
+          geom_text_repel(aes(label = ifelse(NumericYear==2010,Powertrain,"")),
+                          nudge_x = base$nudgeX,
+                          size=3,
+                          na.rm = TRUE,
+                          segment.linetype="blank",
+                          xlim = c(-Inf, Inf), ylim = c(-Inf, Inf)) +
+          geom_text_repel(aes(label = ifelse(NumericYear==2035 & Powertrain %in% c("BEV300","PHEV20"),minString,""),
+                              y = min),
+                          nudge_x = 1,
+                          size=3,
+                          hjust=0,
+                          nudge_y=100,
+                          na.rm = TRUE,
+                          direction="y",
+                          segment.size = 0.2,
+                          #segment.linetype="blank",
+                          xlim = c(2035, Inf), ylim = c(-Inf, Inf)) +
+          geom_text_repel(aes(label = ifelse(NumericYear==2035 & Powertrain %in% c("BEV300","PHEV20"),maxString,""),
+                              y = max),
+                          nudge_x = 1,
+                          size=3,
+                          hjust=0,
+                          nudge_y=-100,
+                          na.rm = TRUE,
+                          direction="y",
+                          segment.size = 0.2,
+                          #segment.linetype="blank",
+                          xlim = c(2035, Inf), ylim = c(-Inf, Inf))
+     ggsave(paste0(results_dir,"TimeSeries_Area_Labeled.pdf"), width=6.5, height=3.5,units="in")
+     
+     geom_text_repel(aes(label = ifelse(NumericYear==2035 & Powertrain %in% c("BEV300","PHEV20"),minString,""),
+                         y = min),
+                     nudge_x = 1,
+                     size=3,
+                     hjust=0,
+                     nudge_y=100,
+                     na.rm = TRUE,
+                     direction="y",
+                     segment.size = 0.2,
+                     #segment.linetype="blank",
+                     xlim = c(2035, Inf), ylim = c(-Inf, Inf)) +
+          geom_text_repel(aes(label = ifelse(NumericYear==2035 & Powertrain %in% c("BEV300","PHEV20"),maxString,""),
+                              y = max),
+                          nudge_x = 1,
+                          size=3,
+                          hjust=0,
+                          nudge_y=0,
+                          na.rm = TRUE,
+                          direction="y",
+                          segment.size = 0.2,
+                          #segment.linetype="blank",
+                          xlim = c(2035, Inf), ylim = c(-Inf, Inf))     
+     ranges <- rollup[!Powertrain %in% c("ICEV","HEV"),.(min=min(Costs),max=max(Costs)),by=.(NumericYear,Powertrain)]
+     base[ranges,':='(min=min,max=max),on=.(NumericYear,Powertrain)]
+     pd <- position_dodge(0.25)
+     minY <- min(min(base$Costs),min(base$min,na.rm=TRUE))-100
+     maxY <- max(max(base$Costs),max(base$max,na.rm=TRUE))+1000
+     base[Powertrain %like% "0" & NumericYear==2010,max:=maxY]
+     base[Powertrain=="HEV",nudgeX:=-0.5]
+     base[Powertrain=="ICEV",nudgeX:=-0.5]
+     base[Powertrain=="PHEV20",nudgeX:=-2]
+     base[Powertrain=="BEV300",nudgeX:=-2.2]
+     ggplot(base, aes(x = NumericYear, 
+                        y = Costs, 
+                        group = Powertrain, 
+                        col = Powertrain)) +           # Draw line plot with ggplot2
+          geom_line(position=pd,linetype = "solid",size=1.0, alpha=1.0) + 
+          geom_pointrange(position=pd,aes(ymax = max,
+                                          ymin = min,
+                                          shape = Powertrain %like% "0")) +
+          geom_text_repel(aes(label = ifelse(NumericYear==2010,Powertrain,"")),
+                           nudge_x = base$nudgeX,
+                           na.rm = TRUE,
+                           segment.linetype="blank",
+                           xlim = c(-Inf, Inf), ylim = c(-Inf, Inf)) +
+          #geom_point(size=3.5) +
+          scale_shape_manual(values=c(NA,16)) +
+          scale_y_continuous(labels=scales::dollar_format(), 
+                             limits=c(minY,maxY),
+                             #breaks=seq(0,10000,2000), 
+                             #minor_breaks = seq(0, 10000, 1000),
+                             position="left",
+                             expand = c(0,0)) + 
+          xlab("PJM Generator Fleet Scenario Year") +
+          ylab("Life cycle air emissions externalities ($/car)") +
+          scale_x_continuous(limits=c(2005,2035.1),breaks=c(2010,2019,2025,2035)) +
+          coord_cartesian(clip="on") +
+          theme_light() + scale_color_brewer(palette = "Dark2") + 
+          theme(legend.position="none",
+                legend.title = element_text(size = 11),
+                legend.text = element_text(size = 11),
+                strip.text = element_text(size = 11),
+                axis.text = element_text(size=11),
+                axis.title = element_text(size=11),
+                panel.grid.major.x = element_blank() ,
+                panel.grid.minor.x = element_blank() ,
+                # explicitly set the horizontal lines (or they will disappear too)
+                panel.grid.major.y = element_line( size=.075, color="grey90" ),
+                panel.grid.minor.y = element_line( size=.075, color="grey90" ) )
+     ggsave(paste0(results_dir,"TimeSeries.pdf"), width=4.5, height=3.5,units="in")
+     
+}
+
+
+plotEvolution_GhGCriteria <- function(){
+     phevChemistry <<- "NMC111"
+     bevChemistry <<- "NMC622"
+     damages <- getAllDamages()
+     rollup <-
+          damages[, .(Costs = sum(cost)), by = .(Powertrain,
+                                                 Year,
+                                                 Type = ifelse(pollutant == "GHGs", "GHGs", "Criteria Pollutants"))]
+     baseline.grid.damages <-
+          damages[Powertrain %like% "ICEV" &
+                       stage %in% c("grid", "upstream_grid"), .(bau_grid_cost = sum(cost)),
+                  by = .(Year, Type = ifelse(pollutant ==
+                                                  "GHGs", "GHGs", "Criteria Pollutants"))]
+     rollup[baseline.grid.damages, Costs := Costs - bau_grid_cost, on =
+                 .(Year, Type)]
+     rollup[, NumericYear := as.numeric(substr(Year, 1, 4))]
+     base <- rollup[!(Powertrain %like% "CC") & !(Year %like% "LessCoal")  & !(Year %like% "22PctRE")]
+     base[,Powertrain:=gsub("-[C,U]C","",Powertrain)]
+     
+     phevChemistry <<- "LFP"
+     bevChemistry <<- "LFP"
+     damages <- getAllDamages()
+     rollup2 <- damages[,.(Costs=sum(cost)),
+                        by=.(Powertrain,Year,Type=ifelse(pollutant=="GHGs","GHGs","Criteria Pollutants"))]
+     baseline.grid.damages <- damages[Powertrain %like% "ICEV" & stage %in% c("grid","upstream_grid"),.(bau_grid_cost=sum(cost)),
+                                      by=.(Year,Type=ifelse(pollutant=="GHGs","GHGs","Criteria Pollutants"))]
+     rollup2[baseline.grid.damages,Costs:=Costs-bau_grid_cost,on=.(Year,Type)]
+     rollup2[,NumericYear:=as.numeric(substr(Year,1,4))]  
+     
+     phevChemistry <<- "NMC111"
+     bevChemistry <<- "NMC811"
+     damages <- getAllDamages()
+     rollup3 <- damages[!(Year=="2010" & Powertrain %like% "CC"),.(Costs=sum(cost)),
+                        by=.(Powertrain,Year,Type=ifelse(pollutant=="GHGs","GHGs","Criteria Pollutants"))]
+     baseline.grid.damages <- damages[Powertrain %like% "ICEV" & stage %in% c("grid","upstream_grid"),.(bau_grid_cost=sum(cost)),
+                                      by=.(Year,Type=ifelse(pollutant=="GHGs","GHGs","Criteria Pollutants"))]
+     rollup3[baseline.grid.damages,Costs:=Costs-bau_grid_cost,on=.(Year,Type)]
+     rollup3[,NumericYear:=as.numeric(substr(Year,1,4))]  
+     
+     rollup <- rbindlist(list(rollup,rollup2,rollup3))
+     rollup[,Powertrain:=gsub("-[C,U]C","",Powertrain)]
+     ranges <- rollup[!Powertrain %in% c("ICEV","HEV"),.(min=min(Costs),max=max(Costs)),by=.(NumericYear,Powertrain,Type)]
+     
+     base[ranges,':='(min=min,max=max),on=.(NumericYear,Powertrain,Type)]
+     base.bak <- copy(base)
+     pd <- position_dodge(0.25)
+     minY <- min(min(base$Costs),min(base$min,na.rm=TRUE))-100
+     maxY <- max(base$Costs,na.rm=TRUE)+1000
+     base[Powertrain %like% "0" & NumericYear==2010 & Type=="Criteria Pollutants",max:=maxY]
+     base[Powertrain=="HEV",nudgeX:=0]
+     base[Powertrain=="ICEV",nudgeX:=0]
+     base[Powertrain=="PHEV20",nudgeX:=0]
+     base[Powertrain=="BEV300",nudgeX:=0]
+     ggplot(base, aes(x = NumericYear, 
+                      y = Costs, 
+                      group = paste0(Powertrain,"_",Type), 
+                      col = Powertrain)) +           # Draw line plot with ggplot2
+          geom_line(position=pd,size=1.0, alpha=1.0,aes(
+               linetype=Type)) + 
+          geom_pointrange(position=pd,aes(ymax = max,
+                                          ymin = min,
+                                          shape = Powertrain %like% "0")) +
+          geom_text_repel(aes(label = ifelse(NumericYear==2010,paste0(Powertrain," ",
+                                                                      ifelse(Type=="GHGs","GHGs","CAPs")),"")),
+                          nudge_x = base$nudgeX,
+                          na.rm = TRUE,
+                          hjust = 1.2,
+                          segment.linetype="blank",
+                          xlim = c(-Inf, Inf), ylim = c(-Inf, Inf)) +
+          #geom_point(size=3.5) +
+          scale_shape_manual(values=c(NA,16)) +
+          scale_y_continuous(labels=scales::dollar_format(), 
+                             limits=c(0,maxY),
+                             #breaks=seq(0,10000,2000), 
+                             #minor_breaks = seq(0, 10000, 1000),
+                             position="left",
+                             expand = c(0,0)) + 
+          xlab("PJM Generator Fleet Scenario Year") +
+          ylab("Life cycle air emissions externalities ($/car)") +
+          scale_x_continuous(limits=c(2004,2035.3),breaks=c(2010,2019,2025,2035)) +
+          coord_cartesian(clip="on") +
+          theme_light() + scale_color_brewer(palette = "Dark2") + 
+          theme(legend.position="none",
+                legend.title = element_text(size = 11),
+                legend.text = element_text(size = 11),
+                strip.text = element_text(size = 11),
+                axis.text = element_text(size=11),
+                axis.title = element_text(size=11),
+                panel.grid.major.x = element_blank() ,
+                panel.grid.minor.x = element_blank() ,
+                # explicitly set the horizontal lines (or they will disappear too)
+                panel.grid.major.y = element_line( size=.075, color="grey90" ),
+                panel.grid.minor.y = element_line( size=.075, color="grey90" ) ) #+
+          #facet_grid(Type ~ .)
+     ggsave(paste0(results_dir,"TimeSeries_Detail.pdf"), width=6.5, height=6.5,units="in")
+}
+
+
+plotEvolution_Old <- function(damages){
      
      rollup <- damages[!(Powertrain %like% "CC"),.(Costs=sum(cost)),by=.(Powertrain,Year)]
      baseline.grid.damages <- damages[Powertrain %like% "ICEV" & stage %in% c("grid","upstream_grid"),.(bau_grid_cost=sum(cost)),by=Year]
@@ -738,7 +1399,7 @@ plotEvolution <- function(damages){
                              #breaks=seq(0,10000,2000), 
                              #minor_breaks = seq(0, 10000, 1000),
                              position="left") + #,
-                             #expand = c(0,0)) + 
+          #expand = c(0,0)) + 
           ylab("Life cycle air emissions externalities ($/car)") +
           scale_x_discrete(expand = c(0.05,0.05)) +
           theme_light() + scale_color_brewer(palette = "Dark2") + 
@@ -757,10 +1418,10 @@ plotEvolution <- function(damages){
 }
 
 
-plotEvolution_GhGCriteria <- function(damages){
+plotEvolution_GhGCriteria_Old <- function(damages){
      
      rollup <- damages[!(Powertrain %like% "CC"),.(Costs=sum(cost)),by=.(Powertrain,Year,
-                                                Type=ifelse(pollutant=="GHGs","GHGs","Criteria Pollutants"))]
+                                                                         Type=ifelse(pollutant=="GHGs","GHGs","Criteria Pollutants"))]
      baseline.grid.damages <- damages[Powertrain %like% "ICEV" & stage %in% c("grid","upstream_grid"),.(bau_grid_cost=sum(cost)),
                                       by=.(Year,Type=ifelse(pollutant=="GHGs","GHGs","Criteria Pollutants"))]
      rollup[baseline.grid.damages,Costs:=Costs-bau_grid_cost,on=.(Year,Type)]
@@ -792,30 +1453,70 @@ plotEvolution_GhGCriteria <- function(damages){
           facet_grid(Type ~ .,scales="free")
      ggsave(paste0(results_dir,"TimeSeries_Detail.pdf"), width=6.5, height=6.5,units="in")
 }
-plotLifeCycleBreakdown <- function(damages,yearToPlot, detailToPlot=""){
-     rollup <- damages[year==yearToPlot & detail==detailToPlot,.(Costs=sum(cost)),by=.(Powertrain,Stage)]
+
+plotLifeCycleBreakdown <- function(damages,yearToPlot, detailToPlot="", bothFormats=FALSE){
+     if(bothFormats){
+          damages <- rbindlist(list(
+               damagesCar[,type:="Car"],
+               damagesPUT[,type:="Pickup Truck"]),
+               use.names=TRUE,fill=TRUE)
+     } else{
+          damages[,type:="Car"]
+     }
+     rollup <- damages[year==yearToPlot & detail==detailToPlot,.(Costs=sum(cost)),by=.(Powertrain,type,Stage)]
      baseline.grid.damages <- rollup[Powertrain %like% "ICEV" & Stage=="Electricity\nProduction",Costs]
      rollup <- rollup[Powertrain %like% "BEV" | Powertrain %like% "PHEV" | !(Stage =="Electricity\nProduction")]
      rollup[Stage=="Electricity\nProduction",Costs:=Costs-baseline.grid.damages]
      rollup$Stage <- fct_relevel(rollup$Stage, c("Vehicle\nUse","Electricity\nProduction","Gasoline\nProduction","Battery\nProduction","Vehicle\nProduction"))
      rollup$Powertrain <- fct_relevel(rollup$Powertrain, c("ICEV","HEV","PHEV20-UC","PHEV20-CC","BEV300-UC","BEV300-CC"))
      
-     ggplot(rollup,aes(x=Powertrain,y=Costs,fill=Stage))+geom_col(width=0.75) +
-          xlab("Powertrain") + ylab("Life cycle air emissions externalities ($/car)") +
-          scale_x_discrete(limits = rev(levels(rollup$Powertrain))) +
-          scale_y_continuous(labels=scales::dollar_format(), limits=c(0,10000),breaks=c(0,2000,4000,6000,8000), position="right") + 
-          scale_fill_manual(values = getFiveColors(), guide = guide_legend(reverse = TRUE)) + 
-          #scale_fill_brewer(palette = "Dark2", guide = guide_legend(reverse = TRUE)) +
-          theme_light() + 
-          theme(legend.position="bottom",
-                legend.title = element_text(size = 11),
-                legend.text = element_text(size = 10),
-                strip.text = element_text(size = 12),
-                axis.text = element_text(size=12),
-                axis.title = element_text(size=12),
-                axis.title.y = element_blank(), 
-                plot.margin = unit(c(0,0,0,0), "cm")) +
-          coord_flip()  
+     if(yearToPlot==2010){
+          lims = c(0,25000)
+          brks = c(0,4000,8000,12000,16000,20000,24000)
+     } else if(bothFormats==TRUE){
+          lims = c(0,34000)
+          brks = c(0,6000,12000,18000,24000, 30000)
+     } else{
+          lims = c(0,10000)
+          brks = c(0,3000,6000,9000)
+     }
+     
+     if(bothFormats){
+          ggplot(rollup,aes(x=Powertrain,y=Costs,fill=Stage))+geom_col(width=0.75) +
+               xlab("Powertrain") + ylab("Life cycle air emissions externalities ($/car)") +
+               scale_x_discrete(limits = rev(levels(rollup$Powertrain))) +
+               scale_y_continuous(labels=scales::dollar_format(), limits=lims,breaks=brks, position="right") + 
+               scale_fill_manual(values = getFiveColors(), guide = guide_legend(reverse = TRUE)) + 
+               #scale_fill_brewer(palette = "Dark2", guide = guide_legend(reverse = TRUE)) +
+               theme_light() + 
+               theme(legend.position="bottom",
+                     legend.title = element_text(size = 11),
+                     legend.text = element_text(size = 10),
+                     strip.text = element_text(size = 12),
+                     axis.text = element_text(size=12),
+                     axis.title = element_text(size=12),
+                     axis.title.y = element_blank(), 
+                     plot.margin = unit(c(0,0,0,0), "cm")) +
+               coord_flip()  + facet_grid(type ~ .)     
+     } else{
+          ggplot(rollup,aes(x=Powertrain,y=Costs,fill=Stage))+geom_col(width=0.75) +
+               xlab("Powertrain") + ylab("Life cycle air emissions externalities ($/car)") +
+               scale_x_discrete(limits = rev(levels(rollup$Powertrain))) +
+               scale_y_continuous(labels=scales::dollar_format(), limits=lims,breaks=brks, position="right") + 
+               scale_fill_manual(values = getFiveColors(), guide = guide_legend(reverse = TRUE)) + 
+               #scale_fill_brewer(palette = "Dark2", guide = guide_legend(reverse = TRUE)) +
+               theme_light() + 
+               theme(legend.position="bottom",
+                     legend.title = element_text(size = 11),
+                     legend.text = element_text(size = 10),
+                     strip.text = element_text(size = 12),
+                     axis.text = element_text(size=12),
+                     axis.title = element_text(size=12),
+                     axis.title.y = element_blank(), 
+                     plot.margin = unit(c(0,0,0,0), "cm")) +
+               coord_flip() 
+     }
+
      suffix <- ifelse(detailToPlot=="","",paste0("_",detailToPlot))
      ggsave(paste0(results_dir,"DamagesByStage_",yearToPlot,suffix,".pdf"), width=6.5, height=4.0,units="in")
 }
@@ -823,6 +1524,20 @@ plotLifeCycleBreakdown <- function(damages,yearToPlot, detailToPlot=""){
 getFiveColors <- function(){
      colors <- RColorBrewer::brewer.pal(5,'Dark2')
      colors <- colors[c(2,1,3,4,5)]
+     #colors <- wes_palette("Darjeeling1", 5, type = "discrete")
+     #colors <- colors[c(3,2,1,5,4)]
+     return(colors)
+}
+
+getFourColors <- function(){
+     #c3f5e6 green BEV UC
+     #1b9e77 green BEV CC
+     #f7b6d7 pink PHEV UC
+     #e7298a pink PHEV CC
+     colors <- c("#C3F5E6","#1B9E77","#F7B6D7","#E7298A")
+     #colors <- wes_palette("Darjeeling1", 5, type = "discrete")
+     #colors <- colors[c(3,2,1,5,4)]
+     return(colors)
 }
 
 getCountyLeaders <- function(){
@@ -899,7 +1614,7 @@ plotDamages <- function(damages,yearToPlot,detailToPlot="",yAxisSuffix,topMargin
           facet_wrap(. ~ Pollutant,scales="free",ncol=2)
 }
 
-makeDamagePlots <- function(){
+getAllDamages <- function(){
      files = list.files(path=results_dir, pattern="*_C{2}",full.names=TRUE)
      damagesGrid <- rbindlist(lapply(files,getPHORUMGridDamages))
      damagesVeh <- rbindlist(lapply(files,getGREETDamages))
@@ -916,21 +1631,35 @@ makeDamagePlots <- function(){
      damages[pollutant=="pm25",pollutant:="PM2.5"]
      damages[pollutant=="so2",pollutant:="SO2"]
      damages[pollutant=="voc",pollutant:="VOC"]
-     damages <- damages[!(detail %like% "LessCoal")]
      damages[stage=="upstream_grid",Stage:="Electricity\nProduction"]
      damages[stage=="upstream_gasoline",Stage:="Gasoline\nProduction"]
      damages[stage=="operations",Stage:="Vehicle\nUse"]
      damages[stage=="grid",Stage:="Electricity\nProduction"]
      damages[stage=="car_manufacture",Stage:="Vehicle\nProduction"]
      damages[stage=="battery_manufacture",Stage:="Battery\nProduction"]
-     
-     plotEvolution(damages)
-     plotEvolution_GhGCriteria(damages)
+     return(damages)
+}
+makeDamagePlots <- function(){
+     damages <- getAllDamages()
+     plotEvolution(damages[!(detail %like% "LessCoal")])
+     plotEvolution_GhGCriteria(damages[!(detail %like% "LessCoal")])
      plotLifeCycleBreakdown(damages,yearToPlot=2010,detailToPlot="")
      plotLifeCycleBreakdown(damages,yearToPlot=2019,detailToPlot="")
      plotLifeCycleBreakdown(damages,yearToPlot=2025,detailToPlot="")
      plotLifeCycleBreakdown(damages,yearToPlot=2035,detailToPlot="10PctRE")
      plotLifeCycleBreakdown(damages,yearToPlot=2035,detailToPlot="22PctRE")
+     plotLifeCycleBreakdown(damages,yearToPlot=2025,detailToPlot="25PctLessCoal")
+     plotLifeCycleBreakdown(damages,yearToPlot=2035,detailToPlot="10PctRE_25PctLessCoal")
+     plotLifeCycleBreakdown(damages,yearToPlot=2035,detailToPlot="22PctRE_25PctLessCoal")
+     plotLifeCycleBreakdown(damages,yearToPlot=2025,detailToPlot="50PctLessCoal")
+     plotLifeCycleBreakdown(damages,yearToPlot=2035,detailToPlot="10PctRE_50PctLessCoal")
+     plotLifeCycleBreakdown(damages,yearToPlot=2035,detailToPlot="22PctRE_50PctLessCoal")
+     plotLifeCycleBreakdown(damages,yearToPlot=2025,detailToPlot="25PctLessCoal_MoreNG")
+     plotLifeCycleBreakdown(damages,yearToPlot=2035,detailToPlot="10PctRE_25PctLessCoal_MoreNG")
+     plotLifeCycleBreakdown(damages,yearToPlot=2035,detailToPlot="22PctRE_25PctLessCoal_MoreNG")
+     plotLifeCycleBreakdown(damages,yearToPlot=2025,detailToPlot="50PctLessCoal_MoreNG")
+     plotLifeCycleBreakdown(damages,yearToPlot=2035,detailToPlot="10PctRE_50PctLessCoal_MoreNG")
+     plotLifeCycleBreakdown(damages,yearToPlot=2035,detailToPlot="22PctRE_50PctLessCoal_MoreNG")
      plot1 <- plotDamages(damages,yearToPlot=2019,detailToPlot="",
                             yAxisSuffix="(a) 2019 Grid",topMargin=0,bottomMargin=0.25)
      plot2 <- plotDamages(damages,yearToPlot=2025,detailToPlot="",
@@ -1030,7 +1759,7 @@ getGenByType <- function(fullString){
      txn <- parse_number(substr(str_extract(runString, "_Txn[0-1]"),5,5))
      detail <- ""
      if(str_count(runString,"_")>3) {
-          detail <- word(runString,-1,sep="_")
+          detail <- substr(runString,str_locate(runString, "_Txn[0-1]")[2]+2,str_length(runString))
      }
      thisPHORUMdata <- getPHORUMgendata(year,runString)
      thisPHORUMdata$genMWh <- genMWh  
@@ -1077,15 +1806,15 @@ plotGenerationEvolutionNoEV <- function(){
 plotGenerationChange <- function(yearToPlot,detailToPlot=""){
      files = list.files(path=results_dir, pattern="*_C{2}",full.names=TRUE)
      if(detailToPlot==""){
-          files <- files[files %like% yearToPlot]
-          ylab = paste0(yearToPlot," grid")
+          files <- files[files %like% paste0(yearToPlot,"_Txn1$")]
+          ylabel = paste0(yearToPlot," grid")
           
      } else{
-          files <- files[files %like% paste0(yearToPlot,"_Txn1_",detailToPlot)]
+          files <- files[files %like% paste0(yearToPlot,"_Txn1_",detailToPlot,"$")]
           ylabel = paste0(yearToPlot," grid, ",detailToPlot)
      }     
      genByType <- rbindlist(lapply(files,getGenByType))
-     bau <- genByType[veh=="ICEV"][,bau.gen:=MWh]
+     bau <- genByType[veh=="CV"][,bau.gen:=MWh]
      genByType[bau,bau.gen:=bau.gen,on=.(type)]
      genByType[,change:=MWh-bau.gen]
      genByType <- genByType[veh %in% c("BEV300_2021GREET")]
@@ -1109,7 +1838,72 @@ plotGenerationChange <- function(yearToPlot,detailToPlot=""){
                 axis.title.y = element_blank(), 
                 plot.margin = unit(c(0,0,0,0), "cm")) +
           coord_flip()  
-     suffix <- ifelse(detailToPlot=="",year,paste0(yearToPlot,"_",detailToPlot))
+     suffix <- ifelse(detailToPlot=="",yearToPlot,paste0(yearToPlot,"_",detailToPlot))
      ggsave(paste0(results_dir,"GenChanges_",suffix,".pdf"), width=6.5, height=3,units="in")
      
+}
+
+plotDispatchCurve <- function(yearToPlot,runString){
+     theseResults <- readMat(paste0(fullString,"\\totalResults.mat"))[[1]]
+     runString <- word(fullString,-1,sep=fixed("\\"))
+     yearToPlot <- parse_number(gsub("_","",str_extract(runString, "_(2)[0-9]{3}_")))
+     genData <- getPHORUMgendata(yearToPlot,runString)
+     REsuffix <- str_extract(runString, "_[0-9]{1,3}PctRE")
+     if(is.na(REsuffix)) REsuffix <- ""
+     glevel <- rowSums(theseResults[[which(dimnames(theseResults)[[1]] %like% 'gLevel')]])
+     
+     load1 <- theseResults[[which(dimnames(theseResults)[[1]] %like% 'loadTCR1')]]
+     load2 <- theseResults[[which(dimnames(theseResults)[[1]] %like% 'loadTCR2')]]
+     load3 <- theseResults[[which(dimnames(theseResults)[[1]] %like% 'loadTCR3')]]
+     load4 <- theseResults[[which(dimnames(theseResults)[[1]] %like% 'loadTCR4')]]
+     load5 <- theseResults[[which(dimnames(theseResults)[[1]] %like% 'loadTCR5')]]
+     load <- colSums(load1+load2+load3+load4+load5)
+     windSolar <- fread(paste0(out_dir,"windSolar_",yearToPlot,REsuffix,".csv"))
+     windSolar <- windSolar[,
+                            .(solarTCR1+solarTCR2+solarTCR3+solarTCR4+solarTCR5+
+                                   windTCR1+windTCR2+windTCR3+windTCR4+windTCR5)]$V1
+     load <- load-windSolar
+     monthDays <- c(31,28,31,30,31,30,31,31,30,31,30,31)
+     monthHours <- data.table(month=1:12,cumsum=cumsum(monthDays)*24)
+     hours <- data.table(hour=1:8760)
+     combos <- data.table(crossing(hours,monthHours))[order(hour)]
+     hour.months <- combos[hour <= cumsum,.(month=min(month)),by=.(hour)]
+     hour.months$load <- load
+     monthly.load <- hour.months[,.(load=sum(load,na.rm=TRUE)),by=month][,load:=load/sum(load,na.rm=TRUE)]
+     genData[,':='(FuelPrice=FuelPrice_01*monthly.load[month==1,load]+
+                        FuelPrice_01*monthly.load[month==1,load]+
+                        FuelPrice_02*monthly.load[month==2,load]+
+                        FuelPrice_03*monthly.load[month==3,load]+
+                        FuelPrice_04*monthly.load[month==4,load]+
+                        FuelPrice_05*monthly.load[month==5,load]+
+                        FuelPrice_06*monthly.load[month==6,load]+
+                        FuelPrice_07*monthly.load[month==7,load]+
+                        FuelPrice_08*monthly.load[month==8,load]+
+                        FuelPrice_09*monthly.load[month==9,load]+
+                        FuelPrice_10*monthly.load[month==10,load]+
+                        FuelPrice_11*monthly.load[month==11,load]+
+                        FuelPrice_12*monthly.load[month==12,load])]
+     genData[,VC:=1.1*HeatRate*FuelPrice + VarOM]
+     genData <- genData[,.(cost=VC,capacity=gen.capacity.needs,fuel_group,total.md,detailed.type)][
+          fuel_group=="Free",fuel_group:="Other"][
+               fuel_group=="Natural Gas" & detailed.type %like% "Combined Cycle",fuel_group:="Combined Cycle Natural Gas"][
+                    fuel_group=="Natural Gas" & !(detailed.type %like% "Combined Cycle"),fuel_group:="Other Natural Gas"][
+                         detailed.type=="Nuclear",fuel_group:="Nuclear"][
+                              fuel_group %like% "Petroleum",fuel_group:="Other"
+                         ]
+     genData <- genData[order(cost)]
+     genData[,cumsum:=cumsum(capacity)]
+     pctile.10 <- quantile(load,0.05)
+     pctile.50 <- quantile(load,0.5)
+     pctile.90 <- quantile(load,0.9)
+     genData <- genData[cost < 200]
+     ggplot(genData[cumsum>=quantile(load,0.00) & cumsum<=quantile(load,1)], aes(x=cumsum, y=cost, color=fuel_group)) + 
+          geom_point(size=1.5) + theme_light() + 
+          scale_color_manual(values = wes_palette("Darjeeling1", length(levels(as.factor(genData$fuel_group))), type = "discrete")) +
+          geom_vline(xintercept=quantile(load,0.05)) + 
+          geom_vline(xintercept=quantile(load,0.5)) + 
+          geom_vline(xintercept=quantile(load,0.95)) +
+          labs(title=paste0("Dispatch curve (",runString,")"),
+               x ="Generation capacity available to meet demand (MW)", y = "Variable operating cost ($/MWh)")
+          
 }

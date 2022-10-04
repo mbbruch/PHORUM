@@ -97,11 +97,11 @@ appendDamages <- function(phorum){
           VOC=fifelse(is.na(VOC),VOC.avg,VOC)
      ),
      on=.(overall.type.needs)]
-     phorum[damages[model=='INMAP' & pollutant=='pm25'],MDPM25:=damage.acs.stacklevel*PM25*tonne.per.lb,on=.(fips=fips)]
-     phorum[damages[model=='INMAP' & pollutant=='so2'],MDSO2:=damage.acs.stacklevel*SO2*tonne.per.lb,on=.(fips=fips)]
-     phorum[damages[model=='INMAP' & pollutant=='voc'],MDVOC:=damage.acs.stacklevel*VOC*tonne.per.lb,on=.(fips=fips)]
-     phorum[damages[model=='INMAP' & pollutant=='nh3'],MDNH3:=damage.acs.stacklevel*NH3*tonne.per.lb,on=.(fips=fips)]
-     phorum[damages[model=='INMAP' & pollutant=='nox'],MDNOX:=damage.acs.stacklevel*NOX*tonne.per.lb,on=.(fips=fips)]
+     phorum[damages[model=='INMAP' & pollutant=='pm25'],MDPM25:=damage.acs.stacklevel*PM25*tonne.per.lb*acs.to.pope2019*vsl,on=.(fips=fips)]
+     phorum[damages[model=='INMAP' & pollutant=='so2'],MDSO2:=damage.acs.stacklevel*SO2*tonne.per.lb*acs.to.pope2019*vsl,on=.(fips=fips)]
+     phorum[damages[model=='INMAP' & pollutant=='voc'],MDVOC:=damage.acs.stacklevel*VOC*tonne.per.lb*acs.to.pope2019*vsl,on=.(fips=fips)]
+     phorum[damages[model=='INMAP' & pollutant=='nh3'],MDNH3:=damage.acs.stacklevel*NH3*tonne.per.lb*acs.to.pope2019*vsl,on=.(fips=fips)]
+     phorum[damages[model=='INMAP' & pollutant=='nox'],MDNOX:=damage.acs.stacklevel*NOX*tonne.per.lb*acs.to.pope2019*vsl,on=.(fips=fips)]
      
      phorum[is.na(MDPM25),MDPM25:=0]
      phorum[is.na(MDSO2),MDSO2:=0]

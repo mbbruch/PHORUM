@@ -6,6 +6,7 @@ combineGenerators <- function(phorum_new, modelingYear){
      no_small_gens <- phorum_new[small.gens<=1][,small.gens:=NULL]
      
      small_gens <- small_gens[,.(gen.id="X",
+                                 online.year=min(online.year,na.rm=TRUE),
                                  PlantCode=paste0(plant.id,"_",unit.type,"_","X"),
                                  gen.capacity.needs=sum(gen.capacity.needs,na.rm=TRUE),
                                  gen.capacity.eia=sum(gen.capacity.eia,na.rm=TRUE),
